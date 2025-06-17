@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -13,7 +13,10 @@
       font-family: Arial, sans-serif;
       background: #f0f0f0;
       text-align: center;
+      padding: 0;
+      box-sizing: border-box;
     }
+
     header {
       background-color: #2c3e50;
       color: white;
@@ -21,43 +24,71 @@
       font-size: 1.5em;
       position: relative;
     }
+
     .settings-icon {
       position: absolute;
       top: 1em;
       right: 1em;
-      font-size: 1.2em;
+      font-size: 1.5em;
       cursor: pointer;
     }
+
     .lock-btn {
       position: absolute;
       top: 1em;
       left: 1em;
-      font-size: 1.2em;
+      font-size: 1.5em;
       cursor: pointer;
       background: none;
       border: none;
       color: white;
     }
+
     .dial-container {
       display: flex;
       justify-content: center;
       gap: 1em;
       margin: 2em auto;
       flex-wrap: wrap;
+      max-width: 100%;
+      padding: 0 10px;
     }
+
     .dial {
+      width: 100px;
+      height: 120px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .dial .values {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      padding: 1em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      overflow-y: auto;
+      height: 100%;
+      transition: transform 0.2s ease-out;
     }
-    select {
-      font-size: 1.2em;
+
+    .dial .values div {
       padding: 0.5em;
+      text-align: center;
+      font-size: 1.2em;
+      background-color: #f4f4f4;
     }
+
+    .dial .values div:nth-child(odd) {
+      background-color: #e0e0e0;
+    }
+
+    .slider-value {
+      font-size: 1.2em;
+      margin-top: 1em;
+    }
+
     .result {
       margin-top: 2em;
       font-size: 1.2em;
@@ -67,14 +98,16 @@
       width: fit-content;
       margin-left: auto;
       margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
+
     .result-table {
       display: grid;
       grid-template-columns: auto auto auto;
       gap: 0.5em 2em;
       text-align: left;
     }
+
     .modal {
       display: none;
       position: fixed;
@@ -82,19 +115,39 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       justify-content: center;
       align-items: center;
     }
+
     .modal-content {
       background: white;
       padding: 2em;
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
       max-width: 90vw;
+      overflow-y: auto;
     }
-    .modal-content input {
-      margin-bottom: 1em;
+
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      .dial-container {
+        flex-direction: column;
+        gap: 1.5em;
+      }
+
+      header {
+        font-size: 1.2em;
+      }
+
+      .lock-btn, .settings-icon {
+        font-size: 1.5em;
+      }
+
+      .result {
+        margin-top: 1em;
+        padding: 0.8em;
+      }
     }
   </style>
 </head>
@@ -106,42 +159,28 @@
   </header>
 
   <div class="dial-container">
-    <div class="dial">
-      <label for="volume">Volume (L)</label>
-      <select id="volume"></select>
+    <div class="dial" id="volume-dial">
+      <div class="values" id="volume-values">
+        <!-- Volume values will go here -->
+      </div>
     </div>
 
-    <div class="dial">
-      <label for="sh">SH %</label>
-      <select id="sh"></select>
+    <div class="dial" id="sh-dial">
+      <div class="values" id="sh-values">
+        <!-- SH values will go here -->
+      </div>
     </div>
 
-    <div class="dial">
-      <label for="surfactant">Surfactant Ratio</label>
-      <select id="surfactant">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133">1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+    <div class="dial" id="surfactant-dial">
+      <div class="values" id="surfactant-values">
+        <!-- Surfactant values will go here -->
+      </div>
     </div>
 
-    <div class="dial">
-      <label for="scent">Scent Ratio</label>
-      <select id="scent">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133">1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+    <div class="dial" id="scent-dial">
+      <div class="values" id="scent-values">
+        <!-- Scent values will go here -->
+      </div>
     </div>
   </div>
 
@@ -187,20 +226,25 @@
       return function (e) {
         if (isLocked) {
           alert('The calculator is locked. Unlock to make changes.');
-          e.target.selectedIndex = e.target.dataset.lastIndex || 0;
+          e.target.value = e.target.dataset.lastValue || e.target.value;
           return;
         }
-        e.target.dataset.lastIndex = e.target.selectedIndex;
+        e.target.dataset.lastValue = e.target.value;
         handler();
       };
     }
 
-    const volume = document.getElementById('volume');
-    const sh = document.getElementById('sh');
-    const surfactant = document.getElementById('surfactant');
-    const scent = document.getElementById('scent');
-    const output = document.getElementById('output');
+    const volumeDial = document.getElementById('volume-dial');
+    const shDial = document.getElementById('sh-dial');
+    const surfactantDial = document.getElementById('surfactant-dial');
+    const scentDial = document.getElementById('scent-dial');
 
+    const volumeValues = document.getElementById('volume-values');
+    const shValues = document.getElementById('sh-values');
+    const surfactantValues = document.getElementById('surfactant-values');
+    const scentValues = document.getElementById('scent-values');
+
+    const output = document.getElementById('output');
     const stockSHInput = document.getElementById('stockSH');
     const shSize = document.getElementById('shSize');
     const shPrice = document.getElementById('shPrice');
@@ -209,119 +253,62 @@
     const scentSize = document.getElementById('scentSize');
     const scentPrice = document.getElementById('scentPrice');
 
-    function populateSHOptions() {
-      for (let i = 5; i <= 200; i += 5) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
-      }
-      [500, 1000].forEach(i => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
+    const valuesList = {
+      volume: Array.from({ length: 100 }, (_, i) => (i + 1).toFixed(1)), // Example values from 1L to 100L
+      sh: Array.from({ length: 20 }, (_, i) => (i + 1).toFixed(1)),     // SH percentage values from 1% to 20%
+      surfactant: Array.from({ length: 33 }, (_, i) => (i * 0.001 + 0.001).toFixed(4)), // Surfactant ratios
+      scent: Array.from({ length: 33 }, (_, i) => (i * 0.001 + 0.001).toFixed(4)), // Scent ratios
+    };
+
+    // Function to populate each dial with values
+    function populateDial(dialId, values) {
+      const valuesElement = document.getElementById(dialId);
+      values.forEach(value => {
+        const div = document.createElement('div');
+        div.textContent = value;
+        valuesElement.appendChild(div);
       });
+    }
 
-      for (let i = 0.5; i <= 6; i += 0.1) {
-        const option = document.createElement('option');
-        option.value = i.toFixed(1);
-        option.textContent = `${i.toFixed(1)}%`;
-        sh.appendChild(option);
+    // Function to update values when dial is rotated
+    function handleDialScroll(dialId, values, event) {
+      const dial = document.getElementById(dialId);
+      const dialHeight = dial.offsetHeight;
+      const valueHeight = dial.querySelector('.values div').offsetHeight;
+
+      let scrollTop = dial.querySelector('.values').scrollTop;
+      const index = Math.floor(scrollTop / valueHeight);
+
+      // Set the selected value based on scroll position
+      updateValue(dialId, values[index]);
+    }
+
+    // Function to update value for a specific dial
+    function updateValue(dialId, value) {
+      if (dialId === 'volume-dial') {
+        document.getElementById('volume-value').textContent = `${value}L`;
+      } else if (dialId === 'sh-dial') {
+        document.getElementById('sh-value').textContent = `${value}%`;
+      } else if (dialId === 'surfactant-dial') {
+        document.getElementById('surfactant-value').textContent = `1:${(1 / value).toFixed(0)}`;
+      } else if (dialId === 'scent-dial') {
+        document.getElementById('scent-value').textContent = `1:${(1 / value).toFixed(0)}`;
       }
-    }
-
-    function calculate() {
-      if (isLocked) return;
-      const total = parseFloat(volume.value);
-      const desiredSH = parseFloat(sh.value);
-      const surfRatio = parseFloat(surfactant.value);
-      const scentRatio = parseFloat(scent.value);
-      const stockSH = parseFloat(stockSHInput.value);
-
-      const shVolume = (desiredSH / stockSH) * total;
-      const surfVolume = surfRatio * total;
-      const scentVolume = scentRatio * total;
-      const waterVolume = total - shVolume - surfVolume - scentVolume;
-
-      const shCost = (parseFloat(shPrice.value) / parseFloat(shSize.value)) * shVolume;
-      const surfCost = (parseFloat(surfactantPrice.value) / parseFloat(surfactantSize.value)) * surfVolume;
-      const scentCost = (parseFloat(scentPrice.value) / parseFloat(scentSize.value)) * scentVolume;
-
-      const totalCost = shCost + surfCost + scentCost;
-
-      output.innerHTML = `
-        <div class="result-table">
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
-          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
-          <div>$${totalCost.toFixed(2)}</div><div><strong>Total</strong></div><div><strong>${total.toFixed(2)}L</strong></div>
-        </div>
-      `;
-
-      const inputsToStore = {
-        volume: volume.value,
-        sh: sh.value,
-        surfactant: surfactant.value,
-        scent: scent.value,
-        stockSH: stockSHInput.value,
-        shSize: shSize.value,
-        shPrice: shPrice.value,
-        surfactantSize: surfactantSize.value,
-        surfactantPrice: surfactantPrice.value,
-        scentSize: scentSize.value,
-        scentPrice: scentPrice.value
-      };
-      localStorage.setItem('batchCalcSettings', JSON.stringify(inputsToStore));
-    }
-
-    function restoreValues() {
-      const saved = localStorage.getItem('batchCalcSettings');
-      if (!saved) return;
-      const data = JSON.parse(saved);
-      volume.value = data.volume || volume.value;
-      sh.value = data.sh || sh.value;
-      surfactant.value = data.surfactant || surfactant.value;
-      scent.value = data.scent || scent.value;
-      stockSHInput.value = data.stockSH || stockSHInput.value;
-      shSize.value = data.shSize || shSize.value;
-      shPrice.value = data.shPrice || shPrice.value;
-      surfactantSize.value = data.surfactantSize || surfactantSize.value;
-      surfactantPrice.value = data.surfactantPrice || surfactantPrice.value;
-      scentSize.value = data.scentSize || scentSize.value;
-      scentPrice.value = data.scentPrice || scentPrice.value;
-    }
-
-    function addChangeListener(el) {
-      el.addEventListener('change', calculate);
-      el.addEventListener('input', calculate);
     }
 
     window.onload = () => {
-      populateSHOptions();
-      restoreValues();
+      populateDial('volume-values', valuesList.volume);
+      populateDial('sh-values', valuesList.sh);
+      populateDial('surfactant-values', valuesList.surfactant);
+      populateDial('scent-values', valuesList.scent);
 
-      [volume, sh, surfactant, scent,
-       stockSHInput, shSize, shPrice,
-       surfactantSize, surfactantPrice,
-       scentSize, scentPrice].forEach(addChangeListener);
-
-      volume.addEventListener('change', handleChangeWrapper(calculate));
-      sh.addEventListener('change', handleChangeWrapper(calculate));
-      surfactant.addEventListener('change', handleChangeWrapper(calculate));
-      scent.addEventListener('change', handleChangeWrapper(calculate));
-
-      calculate();
+      // Add scroll event listeners to the dials
+      volumeDial.addEventListener('scroll', event => handleDialScroll('volume-dial', valuesList.volume, event));
+      shDial.addEventListener('scroll', event => handleDialScroll('sh-dial', valuesList.sh, event));
+      surfactantDial.addEventListener('scroll', event => handleDialScroll('surfactant-dial', valuesList.surfactant, event));
+      scentDial.addEventListener('scroll', event => handleDialScroll('scent-dial', valuesList.scent, event));
     };
   </script>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW registered'))
-        .catch(err => console.error('SW registration failed:', err));
-    }
-  </script>
 </body>
 </html>
