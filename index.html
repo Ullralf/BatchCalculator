@@ -66,12 +66,14 @@
       max-width: 250px;
     }
 
-    select {
-      font-size: 1.2em;
-      padding: 0.5em;
+    input[type="range"] {
       width: 100%;
       max-width: 250px;
-      box-sizing: border-box;
+      margin: 1em 0;
+    }
+
+    .slider-value {
+      font-size: 1.2em;
     }
 
     .result {
@@ -150,40 +152,26 @@
   <div class="dial-container">
     <div class="dial">
       <label for="volume">Volume (L)</label>
-      <select id="volume"></select>
+      <input type="range" id="volume" min="1" max="100" step="0.1" value="20">
+      <div class="slider-value" id="volume-value">20 L</div>
     </div>
 
     <div class="dial">
       <label for="sh">SH %</label>
-      <select id="sh"></select>
+      <input type="range" id="sh" min="1" max="20" step="0.1" value="12.5">
+      <div class="slider-value" id="sh-value">12.5%</div>
     </div>
 
     <div class="dial">
       <label for="surfactant">Surfactant Ratio</label>
-      <select id="surfactant">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133" selected>1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+      <input type="range" id="surfactant" min="0.001" max="0.0333" step="0.0001" value="0.0133">
+      <div class="slider-value" id="surfactant-value">1:75</div>
     </div>
 
     <div class="dial">
       <label for="scent">Scent Ratio</label>
-      <select id="scent">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133" selected>1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+      <input type="range" id="scent" min="0.001" max="0.0333" step="0.0001" value="0.0133">
+      <div class="slider-value" id="scent-value">1:75</div>
     </div>
   </div>
 
@@ -229,10 +217,10 @@
       return function (e) {
         if (isLocked) {
           alert('The calculator is locked. Unlock to make changes.');
-          e.target.selectedIndex = e.target.dataset.lastIndex || 0;
+          e.target.value = e.target.dataset.lastValue || e.target.value;
           return;
         }
-        e.target.dataset.lastIndex = e.target.selectedIndex;
+        e.target.dataset.lastValue = e.target.value;
         handler();
       };
     }
@@ -241,6 +229,10 @@
     const sh = document.getElementById('sh');
     const surfactant = document.getElementById('surfactant');
     const scent = document.getElementById('scent');
+    const volumeValue = document.getElementById('volume-value');
+    const shValue = document.getElementById('sh-value');
+    const surfactantValue = document.getElementById('surfactant-value');
+    const scentValue = document.getElementById('scent-value');
     const output = document.getElementById('output');
 
     const stockSHInput = document.getElementById('stockSH');
@@ -252,25 +244,25 @@
     const scentPrice = document.getElementById('scentPrice');
 
     function populateSHOptions() {
-      for (let i = 5; i <= 200; i += 5) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
-      }
-      [500, 1000].forEach(i => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
-      });
+      volume.addEventListener('input', handleChangeWrapper(function () {
+        volumeValue.textContent = `${volume.value} L`;
+        calculate();
+      }));
 
-      for (let i = 0.5; i <= 6; i += 0.1) {
-        const option = document.createElement('option');
-        option.value = i.toFixed(1);
-        option.textContent = `${i.toFixed(1)}%`;
-        sh.appendChild(option);
-      }
+      sh.addEventListener('input', handleChangeWrapper(function () {
+        shValue.textContent = `${sh.value}%`;
+        calculate();
+      }));
+
+      surfactant.addEventListener('input', handleChangeWrapper(function () {
+        surfactantValue.textContent = `1:${(1 / surfactant.value).toFixed(0)}`;
+        calculate();
+      }));
+
+      scent.addEventListener('input', handleChangeWrapper(function () {
+        scentValue.textContent = `1:${(1 / scent.value).toFixed(0)}`;
+        calculate();
+      }));
     }
 
     function calculate() {
@@ -310,19 +302,6 @@
 
     window.onload = () => {
       populateSHOptions();
-      document.getElementById('surfactant').selectedIndex = 3;
-      document.getElementById('scent').selectedIndex = 3;
-
-      [volume, sh, surfactant, scent,
-       stockSHInput, shSize, shPrice,
-       surfactantSize, surfactantPrice,
-       scentSize, scentPrice].forEach(addChangeListener);
-
-      volume.addEventListener('change', handleChangeWrapper(calculate));
-      sh.addEventListener('change', handleChangeWrapper(calculate));
-      surfactant.addEventListener('change', handleChangeWrapper(calculate));
-      scent.addEventListener('change', handleChangeWrapper(calculate));
-
       calculate();
     };
   </script>
