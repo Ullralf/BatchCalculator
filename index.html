@@ -154,3 +154,119 @@
         <option value="0.025">1:40</option>
         <option value="0.0333">1:30</option>
       </select>
+    </div>
+  </div>
+
+  <div class="result" id="output">
+    Select values to see the mix breakdown.
+  </div>
+
+  <div id="settingsModal" class="modal" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3>Settings</h3>
+      <label for="stockSH">Stock SH Strength (%):</label>
+      <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1" onchange="calculate()">
+
+      <section>
+        <h4>Cost Calculations</h4>
+
+        <label for="shContainerSize">SH Container Size (L):</label>
+        <input type="number" id="shContainerSize" value="20" min="0">
+
+        <label for="shContainerPrice">SH Container Price ($):</label>
+        <input type="number" id="shContainerPrice" value="50" min="0" step="0.01">
+
+        <label for="surfactantContainerSize">Surfactant Container Size (L):</label>
+        <input type="number" id="surfactantContainerSize" value="5" min="0">
+
+        <label for="surfactantContainerPrice">Surfactant Container Price ($):</label>
+        <input type="number" id="surfactantContainerPrice" value="30" min="0" step="0.01">
+
+        <label for="scentContainerSize">Scent Container Size (L):</label>
+        <input type="number" id="scentContainerSize" value="1" min="0">
+
+        <label for="scentContainerPrice">Scent Container Price ($):</label>
+        <input type="number" id="scentContainerPrice" value="20" min="0" step="0.01">
+      </section>
+    </div>
+  </div>
+
+  <script>
+    let isLocked = false;
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
+    }
+
+    function handleChangeWrapper(handler) {
+      return function(e) {
+        if (isLocked) {
+          alert('The calculator is locked. Unlock to make changes.');
+          e.target.selectedIndex = e.target.dataset.lastIndex || 0;
+          return;
+        }
+        e.target.dataset.lastIndex = e.target.selectedIndex;
+        handler();
+      };
+    }
+
+    const volume = document.getElementById('volume');
+    const sh = document.getElementById('sh');
+    const surfactant = document.getElementById('surfactant');
+    const scent = document.getElementById('scent');
+    const output = document.getElementById('output');
+    const stockSHInput = document.getElementById('stockSH');
+
+    function populateSHOptions() {
+      for (let i = 0.5; i <= 6; i += 0.1) {
+        const option = document.createElement('option');
+        option.value = i.toFixed(1);
+        option.textContent = `${i.toFixed(1)}%`;
+        sh.appendChild(option);
+      }
+    }
+
+    function calculate() {
+      if (isLocked) return;
+      const total = parseFloat(volume.value);
+      const desiredSH = parseFloat(sh.value);
+      const surfRatio = parseFloat(surfactant.value);
+      const scentRatio = parseFloat(scent.value);
+      const stockSH = parseFloat(stockSHInput.value);
+
+      const shVolume = (desiredSH / stockSH) * total;
+      const surfVolume = surfRatio * total;
+      const scentVolume = scentRatio * total;
+      const waterVolume = total - shVolume - surfVolume - scentVolume;
+
+      output.innerHTML = `
+        <strong>SH:</strong> ${shVolume.toFixed(2)}L<br>
+        <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
+        <strong>Surfactant:</strong> ${surfVolume.toFixed(2)}L<br>
+        <strong>Scent:</strong> ${scentVolume.toFixed(2)}L
+      `;
+    }
+
+    volume.addEventListener('change', handleChangeWrapper(calculate));
+    sh.addEventListener('change', handleChangeWrapper(calculate));
+    surfactant.addEventListener('change', handleChangeWrapper(calculate));
+    scent.addEventListener('change', handleChangeWrapper(calculate));
+
+    window.onload = () => {
+      populateSHOptions();
+      document.getElementById('surfactant').selectedIndex = 3;
+      document.getElementById('scent').selectedIndex = 3;
+      calculate();
+    };
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW registered'))
+        .catch(err => console.error('SW registration failed:', err));
+    }
+  </script>
+</body>
+</html>
