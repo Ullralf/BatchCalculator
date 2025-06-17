@@ -63,25 +63,14 @@
       overflow: hidden;
       position: relative;
       cursor: pointer;
-    }
-
-    .dial .values {
       display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      height: 100%;
-      transition: transform 0.2s ease-out;
+      align-items: center;
+      justify-content: center;
     }
 
-    .dial .values div {
-      padding: 0.5em;
-      text-align: center;
-      font-size: 1.2em;
-      background-color: #f4f4f4;
-    }
-
-    .dial .values div:nth-child(odd) {
-      background-color: #e0e0e0;
+    .dial .value {
+      font-size: 1.5em;
+      font-weight: bold;
     }
 
     .slider-value {
@@ -159,28 +148,20 @@
   </header>
 
   <div class="dial-container">
-    <div class="dial" id="volume-dial">
-      <div class="values" id="volume-values">
-        <!-- Volume values will go here -->
-      </div>
+    <div class="dial" id="volume-dial" onclick="rotateDial('volume-dial')">
+      <div class="value" id="volume-value">1.0L</div>
     </div>
 
-    <div class="dial" id="sh-dial">
-      <div class="values" id="sh-values">
-        <!-- SH values will go here -->
-      </div>
+    <div class="dial" id="sh-dial" onclick="rotateDial('sh-dial')">
+      <div class="value" id="sh-value">12.5%</div>
     </div>
 
-    <div class="dial" id="surfactant-dial">
-      <div class="values" id="surfactant-values">
-        <!-- Surfactant values will go here -->
-      </div>
+    <div class="dial" id="surfactant-dial" onclick="rotateDial('surfactant-dial')">
+      <div class="value" id="surfactant-value">1:1000</div>
     </div>
 
-    <div class="dial" id="scent-dial">
-      <div class="values" id="scent-values">
-        <!-- Scent values will go here -->
-      </div>
+    <div class="dial" id="scent-dial" onclick="rotateDial('scent-dial')">
+      <div class="value" id="scent-value">1:1000</div>
     </div>
   </div>
 
@@ -239,10 +220,10 @@
     const surfactantDial = document.getElementById('surfactant-dial');
     const scentDial = document.getElementById('scent-dial');
 
-    const volumeValues = document.getElementById('volume-values');
-    const shValues = document.getElementById('sh-values');
-    const surfactantValues = document.getElementById('surfactant-values');
-    const scentValues = document.getElementById('scent-values');
+    const volumeValue = document.getElementById('volume-value');
+    const shValue = document.getElementById('sh-value');
+    const surfactantValue = document.getElementById('surfactant-value');
+    const scentValue = document.getElementById('scent-value');
 
     const output = document.getElementById('output');
     const stockSHInput = document.getElementById('stockSH');
@@ -260,53 +241,43 @@
       scent: Array.from({ length: 33 }, (_, i) => (i * 0.001 + 0.001).toFixed(4)), // Scent ratios
     };
 
-    // Function to populate each dial with values
-    function populateDial(dialId, values) {
-      const valuesElement = document.getElementById(dialId);
-      values.forEach(value => {
-        const div = document.createElement('div');
-        div.textContent = value;
-        valuesElement.appendChild(div);
-      });
-    }
+    function rotateDial(dialId) {
+      let dialValue = null;
 
-    // Function to update values when dial is rotated
-    function handleDialScroll(dialId, values, event) {
-      const dial = document.getElementById(dialId);
-      const dialHeight = dial.offsetHeight;
-      const valueHeight = dial.querySelector('.values div').offsetHeight;
-
-      let scrollTop = dial.querySelector('.values').scrollTop;
-      const index = Math.floor(scrollTop / valueHeight);
-
-      // Set the selected value based on scroll position
-      updateValue(dialId, values[index]);
-    }
-
-    // Function to update value for a specific dial
-    function updateValue(dialId, value) {
       if (dialId === 'volume-dial') {
-        document.getElementById('volume-value').textContent = `${value}L`;
+        dialValue = valuesList.volume[(Math.floor(Math.random() * valuesList.volume.length))];
+        volumeValue.textContent = `${dialValue}L`;
       } else if (dialId === 'sh-dial') {
-        document.getElementById('sh-value').textContent = `${value}%`;
+        dialValue = valuesList.sh[(Math.floor(Math.random() * valuesList.sh.length))];
+        shValue.textContent = `${dialValue}%`;
       } else if (dialId === 'surfactant-dial') {
-        document.getElementById('surfactant-value').textContent = `1:${(1 / value).toFixed(0)}`;
+        dialValue = valuesList.surfactant[(Math.floor(Math.random() * valuesList.surfactant.length))];
+        surfactantValue.textContent = `1:${(1 / dialValue).toFixed(0)}`;
       } else if (dialId === 'scent-dial') {
-        document.getElementById('scent-value').textContent = `1:${(1 / value).toFixed(0)}`;
+        dialValue = valuesList.scent[(Math.floor(Math.random() * valuesList.scent.length))];
+        scentValue.textContent = `1:${(1 / dialValue).toFixed(0)}`;
       }
+
+      updateOutput();
+    }
+
+    function updateOutput() {
+      const volume = parseFloat(volumeValue.textContent);
+      const sh = parseFloat(shValue.textContent.replace('%', ''));
+      const surfactant = parseFloat(surfactantValue.textContent.split(':')[1]);
+      const scent = parseFloat(scentValue.textContent.split(':')[1]);
+
+      // Simulate calculation (e.g., cost, ratios)
+      output.textContent = `For ${volume}L of solution at ${sh}% SH strength:
+        \nSurfactant: 1:${surfactant}
+        \nScent: 1:${scent}`;
     }
 
     window.onload = () => {
-      populateDial('volume-values', valuesList.volume);
-      populateDial('sh-values', valuesList.sh);
-      populateDial('surfactant-values', valuesList.surfactant);
-      populateDial('scent-values', valuesList.scent);
-
-      // Add scroll event listeners to the dials
-      volumeDial.addEventListener('scroll', event => handleDialScroll('volume-dial', valuesList.volume, event));
-      shDial.addEventListener('scroll', event => handleDialScroll('sh-dial', valuesList.sh, event));
-      surfactantDial.addEventListener('scroll', event => handleDialScroll('surfactant-dial', valuesList.surfactant, event));
-      scentDial.addEventListener('scroll', event => handleDialScroll('scent-dial', valuesList.scent, event));
+      rotateDial('volume-dial');
+      rotateDial('sh-dial');
+      rotateDial('surfactant-dial');
+      rotateDial('scent-dial');
     };
   </script>
 
