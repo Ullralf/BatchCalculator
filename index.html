@@ -106,7 +106,7 @@
   <header>
     <button class="lock-btn" onclick="toggleLock()">🔓</button>
     BatchCalculator
-    <span class="settings-icon" onclick="alert('Settings unavailable in demo')">⚙️</span>
+    <span class="settings-icon" onclick="window.location.href='cost-settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
@@ -130,10 +130,10 @@
 
   <div class="result" id="output">
     <div class="result-table">
-      <div></div><div>Water</div><div>0.00L</div>
-      <div></div><div>SH</div><div>0.00L</div>
-      <div></div><div>Surfactant</div><div>0.00L</div>
-      <div></div><div>Scent</div><div>0.00L</div>
+      <div>Cost</div><div>Water</div><div>0.00L</div>
+      <div>$0.00</div><div>SH</div><div>0.00L</div>
+      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
+      <div>$0.00</div><div>Scent</div><div>0.00L</div>
     </div>
   </div>
 
@@ -193,6 +193,10 @@
       const scent = getCenterValue(scentList);
       const stockSH = 12.5;
 
+      const shCostPerL = 1.5;
+      const surfCostPerL = 6.0;
+      const scentCostPerL = 8.0;
+
       if ([volume, sh, surfactant, scent].includes(null)) return;
 
       const shVol = (sh / stockSH) * volume;
@@ -200,12 +204,16 @@
       const scentVol = scent * volume;
       const water = volume - shVol - surfVol - scentVol;
 
+      const shCost = shVol * shCostPerL;
+      const surfCost = surfVol * surfCostPerL;
+      const scentCost = scentVol * scentCostPerL;
+
       document.getElementById("output").innerHTML = `
         <div class="result-table">
-          <div></div><div>Water</div><div>${water.toFixed(2)}L</div>
-          <div></div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-          <div></div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-          <div></div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
+          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
+          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
+          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
+          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
         </div>`;
     }
 
