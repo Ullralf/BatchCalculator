@@ -47,7 +47,7 @@
     .dial-container {
       display: flex;
       justify-content: center;
-      gap: 1em;
+      gap: 2em;
       margin: 2em auto;
       flex-wrap: wrap;
       max-width: 100%;
@@ -64,13 +64,21 @@
       position: relative;
       cursor: pointer;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 1em;
     }
 
     .dial .value {
       font-size: 1.5em;
       font-weight: bold;
+    }
+
+    .dial .title {
+      font-size: 1em;
+      margin-bottom: 0.5em;
+      color: #333;
     }
 
     .slider-value {
@@ -148,19 +156,23 @@
   </header>
 
   <div class="dial-container">
-    <div class="dial" id="volume-dial" onclick="rotateDial('volume-dial')">
+    <div class="dial" id="volume-dial" ontouchstart="startSwipe(event, 'volume-dial')" ontouchmove="moveSwipe(event, 'volume-dial')" ontouchend="endSwipe()">
+      <div class="title">Volume</div>
       <div class="value" id="volume-value">1.0L</div>
     </div>
 
-    <div class="dial" id="sh-dial" onclick="rotateDial('sh-dial')">
+    <div class="dial" id="sh-dial" ontouchstart="startSwipe(event, 'sh-dial')" ontouchmove="moveSwipe(event, 'sh-dial')" ontouchend="endSwipe()">
+      <div class="title">SH Strength</div>
       <div class="value" id="sh-value">12.5%</div>
     </div>
 
-    <div class="dial" id="surfactant-dial" onclick="rotateDial('surfactant-dial')">
+    <div class="dial" id="surfactant-dial" ontouchstart="startSwipe(event, 'surfactant-dial')" ontouchmove="moveSwipe(event, 'surfactant-dial')" ontouchend="endSwipe()">
+      <div class="title">Surfactant</div>
       <div class="value" id="surfactant-value">1:1000</div>
     </div>
 
-    <div class="dial" id="scent-dial" onclick="rotateDial('scent-dial')">
+    <div class="dial" id="scent-dial" ontouchstart="startSwipe(event, 'scent-dial')" ontouchmove="moveSwipe(event, 'scent-dial')" ontouchend="endSwipe()">
+      <div class="title">Scent</div>
       <div class="value" id="scent-value">1:1000</div>
     </div>
   </div>
@@ -197,6 +209,8 @@
 
   <script>
     let isLocked = false;
+    let swipeStart = 0;
+    let swipeEnd = 0;
 
     function toggleLock() {
       isLocked = !isLocked;
@@ -215,25 +229,6 @@
       };
     }
 
-    const volumeDial = document.getElementById('volume-dial');
-    const shDial = document.getElementById('sh-dial');
-    const surfactantDial = document.getElementById('surfactant-dial');
-    const scentDial = document.getElementById('scent-dial');
-
-    const volumeValue = document.getElementById('volume-value');
-    const shValue = document.getElementById('sh-value');
-    const surfactantValue = document.getElementById('surfactant-value');
-    const scentValue = document.getElementById('scent-value');
-
-    const output = document.getElementById('output');
-    const stockSHInput = document.getElementById('stockSH');
-    const shSize = document.getElementById('shSize');
-    const shPrice = document.getElementById('shPrice');
-    const surfactantSize = document.getElementById('surfactantSize');
-    const surfactantPrice = document.getElementById('surfactantPrice');
-    const scentSize = document.getElementById('scentSize');
-    const scentPrice = document.getElementById('scentPrice');
-
     const valuesList = {
       volume: Array.from({ length: 100 }, (_, i) => (i + 1).toFixed(1)), // Example values from 1L to 100L
       sh: Array.from({ length: 20 }, (_, i) => (i + 1).toFixed(1)),     // SH percentage values from 1% to 20%
@@ -241,43 +236,59 @@
       scent: Array.from({ length: 33 }, (_, i) => (i * 0.001 + 0.001).toFixed(4)), // Scent ratios
     };
 
-    function rotateDial(dialId) {
-      let dialValue = null;
+    function startSwipe(e, dialId) {
+      swipeStart = e.touches[0].clientY;
+    }
+
+    function moveSwipe(e, dialId) {
+      swipeEnd = e.touches[0].clientY;
+    }
+
+    function endSwipe() {
+      const swipeDifference = swipeStart - swipeEnd;
+      if (Math.abs(swipeDifference) > 10) {
+        if (swipeDifference > 0) {
+          // Swipe Up (Increase value)
+          updateDialValue(dialId, 1);
+        } else {
+          // Swipe Down (Decrease value)
+          updateDialValue(dialId, -1);
+        }
+      }
+    }
+
+    function updateDialValue(dialId, direction) {
+      const dial = document.getElementById(dialId);
+      let value = parseFloat(dial.querySelector('.value').textContent);
 
       if (dialId === 'volume-dial') {
-        dialValue = valuesList.volume[(Math.floor(Math.random() * valuesList.volume.length))];
-        volumeValue.textContent = `${dialValue}L`;
+        value = direction > 0 ? Math.min(value + 0.1, 100) : Math.max(value - 0.1, 1);
+        dial.querySelector('.value').textContent = `${value.toFixed(1)}L`;
       } else if (dialId === 'sh-dial') {
-        dialValue = valuesList.sh[(Math.floor(Math.random() * valuesList.sh.length))];
-        shValue.textContent = `${dialValue}%`;
-      } else if (dialId === 'surfactant-dial') {
-        dialValue = valuesList.surfactant[(Math.floor(Math.random() * valuesList.surfactant.length))];
-        surfactantValue.textContent = `1:${(1 / dialValue).toFixed(0)}`;
-      } else if (dialId === 'scent-dial') {
-        dialValue = valuesList.scent[(Math.floor(Math.random() * valuesList.scent.length))];
-        scentValue.textContent = `1:${(1 / dialValue).toFixed(0)}`;
+        value = direction > 0 ? Math.min(value + 0.1, 20) : Math.max(value - 0.1, 1);
+        dial.querySelector('.value').textContent = `${value.toFixed(1)}%`;
+      } else if (dialId === 'surfactant-dial' || dialId === 'scent-dial') {
+        value = direction > 0 ? Math.min(value + 0.001, 0.1) : Math.max(value - 0.001, 0.001);
+        dial.querySelector('.value').textContent = `1:${(1 / value).toFixed(0)}`;
       }
 
       updateOutput();
     }
 
     function updateOutput() {
-      const volume = parseFloat(volumeValue.textContent);
-      const sh = parseFloat(shValue.textContent.replace('%', ''));
-      const surfactant = parseFloat(surfactantValue.textContent.split(':')[1]);
-      const scent = parseFloat(scentValue.textContent.split(':')[1]);
+      const volume = parseFloat(document.getElementById('volume-value').textContent);
+      const sh = parseFloat(document.getElementById('sh-value').textContent.replace('%', ''));
+      const surfactant = parseFloat(document.getElementById('surfactant-value').textContent.split(':')[1]);
+      const scent = parseFloat(document.getElementById('scent-value').textContent.split(':')[1]);
 
       // Simulate calculation (e.g., cost, ratios)
-      output.textContent = `For ${volume}L of solution at ${sh}% SH strength:
+      document.getElementById('output').textContent = `For ${volume}L of solution at ${sh}% SH strength:
         \nSurfactant: 1:${surfactant}
         \nScent: 1:${scent}`;
     }
 
     window.onload = () => {
-      rotateDial('volume-dial');
-      rotateDial('sh-dial');
-      rotateDial('surfactant-dial');
-      rotateDial('scent-dial');
+      updateOutput();
     };
   </script>
 
