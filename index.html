@@ -233,8 +233,8 @@
       const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
 
       output.innerHTML = `
+        <strong>Water:${waterVolume.toFixed(2)}L</strong><br>
         <strong>$${shCost.toFixed(2)} SH ${shVolume.toFixed(2)}L</strong><br>
-        <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
         <strong>$${surfCost.toFixed(2)} Surfactant ${surfVolume.toFixed(2)}L</strong><br>
         <strong>$${scentCost.toFixed(2)} Scent ${scentVolume.toFixed(2)}L</strong>
       `;
