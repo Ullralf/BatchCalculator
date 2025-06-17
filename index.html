@@ -41,46 +41,38 @@
     .dial-container {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      overflow-x: auto;
-      padding: 0.5em;
+      gap: 1em;
       margin: 1em auto;
-      gap: 0.5em;
       flex-wrap: nowrap;
+      overflow-x: auto;
     }
     .dial {
-      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background: white;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 0.5em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       width: 80px;
-      text-align: center;
     }
     .dial label {
-      font-size: 0.8em;
-      margin-bottom: 0.4em;
-      display: block;
+      margin-bottom: 0.5em;
     }
-    select {
-      font-size: 1.2em;
-      padding: 0.3em;
-      height: 120px;
+    .scroll-list {
+      height: 100px;
       overflow-y: scroll;
-      text-align: center;
-      writing-mode: vertical-lr;
-      appearance: none;
-      -webkit-appearance: none;
-      background: none;
-      border: none;
       scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    select option {
-      height: 40px;
-      scroll-snap-align: center;
-    }
-    select::-webkit-scrollbar {
+    .scroll-list::-webkit-scrollbar {
       display: none;
+    }
+    .scroll-item {
+      scroll-snap-align: center;
+      font-size: 1.2em;
+      padding: 0.5em;
     }
     .result {
       margin-top: 1em;
@@ -88,11 +80,10 @@
       background: white;
       padding: 1em;
       border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      width: 90%;
-      max-width: 400px;
+      width: fit-content;
       margin-left: auto;
       margin-right: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .result-table {
       display: grid;
@@ -100,226 +91,106 @@
       gap: 0.5em 2em;
       text-align: left;
     }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      max-width: 90vw;
-    }
-    .modal-content input {
-      margin-bottom: 1em;
-    }
   </style>
 </head>
 <body>
   <header>
     <button class="lock-btn" onclick="toggleLock()">🔓</button>
     BatchCalculator
-    <span class="settings-icon" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</span>
+    <span class="settings-icon" onclick="alert('Settings unavailable in demo')">⚙️</span>
   </header>
 
   <div class="dial-container">
     <div class="dial">
-      <label for="volume">Volume</label>
-      <select id="volume"></select>
+      <label>Volume (L)</label>
+      <div class="scroll-list" id="volumeList"></div>
     </div>
     <div class="dial">
-      <label for="sh">SH %</label>
-      <select id="sh"></select>
+      <label>SH %</label>
+      <div class="scroll-list" id="shList"></div>
     </div>
     <div class="dial">
-      <label for="surfactant">Surfactant</label>
-      <select id="surfactant">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133">1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+      <label>Surfactant</label>
+      <div class="scroll-list" id="surfactantList"></div>
     </div>
     <div class="dial">
-      <label for="scent">Scent</label>
-      <select id="scent">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133">1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
+      <label>Scent</label>
+      <div class="scroll-list" id="scentList"></div>
     </div>
   </div>
 
   <div class="result" id="output">Select values to see the mix breakdown.</div>
 
-  <div id="settingsModal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <h3>Settings</h3>
-      <label for="stockSH">Stock SH Strength (%):</label>
-      <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1">
-
-      <h4>Cost Calculations</h4>
-      <div>
-        <label>SH Container Size (L):</label>
-        <input type="number" id="shSize" value="20">
-        <label>Price ($):</label>
-        <input type="number" id="shPrice" value="80">
-      </div>
-      <div>
-        <label>Surfactant Container Size (L):</label>
-        <input type="number" id="surfactantSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="surfactantPrice" value="50">
-      </div>
-      <div>
-        <label>Scent Container Size (L):</label>
-        <input type="number" id="scentSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="scentPrice" value="50">
-      </div>
-    </div>
-  </div>
-
   <script>
-    let isLocked = false;
+    const volumeList = document.getElementById("volumeList");
+    const shList = document.getElementById("shList");
+    const surfactantList = document.getElementById("surfactantList");
+    const scentList = document.getElementById("scentList");
 
-    function toggleLock() {
-      isLocked = !isLocked;
-      document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
+    function createOptionList(container, options, unit) {
+      options.forEach((val, i) => {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = val;
+        item.textContent = val + (unit || "");
+        container.appendChild(item);
+      });
     }
 
-    const volume = document.getElementById('volume');
-    const sh = document.getElementById('sh');
-    const surfactant = document.getElementById('surfactant');
-    const scent = document.getElementById('scent');
-    const output = document.getElementById('output');
-    const stockSHInput = document.getElementById('stockSH');
-    const shSize = document.getElementById('shSize');
-    const shPrice = document.getElementById('shPrice');
-    const surfactantSize = document.getElementById('surfactantSize');
-    const surfactantPrice = document.getElementById('surfactantPrice');
-    const scentSize = document.getElementById('scentSize');
-    const scentPrice = document.getElementById('scentPrice');
-
-    function populateSHOptions() {
-      for (let i = 5; i <= 200; i += 5) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
-      }
-      [500, 1000].forEach(i => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i}L`;
-        volume.appendChild(option);
+    function getCenterValue(container) {
+      const center = container.scrollTop + container.clientHeight / 2;
+      const items = container.querySelectorAll(".scroll-item");
+      let closest = null;
+      let minDist = Infinity;
+      items.forEach(item => {
+        const box = item.getBoundingClientRect();
+        const itemCenter = box.top + box.height / 2;
+        const dist = Math.abs(itemCenter - (window.innerHeight / 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closest = item;
+        }
       });
-      for (let i = 0.5; i <= 6; i += 0.1) {
-        const option = document.createElement('option');
-        option.value = i.toFixed(1);
-        option.textContent = `${i.toFixed(1)}%`;
-        sh.appendChild(option);
-      }
+      return closest ? parseFloat(closest.dataset.value) : null;
     }
 
     function calculate() {
-      if (isLocked) return;
-      const total = parseFloat(volume.value);
-      const desiredSH = parseFloat(sh.value);
-      const surfRatio = parseFloat(surfactant.value);
-      const scentRatio = parseFloat(scent.value);
-      const stockSH = parseFloat(stockSHInput.value);
+      const volume = getCenterValue(volumeList);
+      const sh = getCenterValue(shList);
+      const surfactant = getCenterValue(surfactantList);
+      const scent = getCenterValue(scentList);
+      const stockSH = 12.5;
 
-      const shVolume = (desiredSH / stockSH) * total;
-      const surfVolume = surfRatio * total;
-      const scentVolume = scentRatio * total;
-      const waterVolume = total - shVolume - surfVolume - scentVolume;
+      if ([volume, sh, surfactant, scent].includes(null)) return;
 
-      const shCost = (parseFloat(shPrice.value) / parseFloat(shSize.value)) * shVolume;
-      const surfCost = (parseFloat(surfactantPrice.value) / parseFloat(surfactantSize.value)) * surfVolume;
-      const scentCost = (parseFloat(scentPrice.value) / parseFloat(scentSize.value)) * scentVolume;
-      const totalCost = shCost + surfCost + scentCost;
+      const shVol = (sh / stockSH) * volume;
+      const surfVol = surfactant * volume;
+      const scentVol = scent * volume;
+      const water = volume - shVol - surfVol - scentVol;
 
-      output.innerHTML = `
+      document.getElementById("output").innerHTML = `
         <div class="result-table">
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
-          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
-          <div>$${totalCost.toFixed(2)}</div><div><strong>Total</strong></div><div><strong>${total.toFixed(2)}L</strong></div>
-        </div>
-      `;
-      localStorage.setItem('batchCalcSettings', JSON.stringify({
-        volume: volume.value,
-        sh: sh.value,
-        surfactant: surfactant.value,
-        scent: scent.value,
-        stockSH: stockSHInput.value,
-        shSize: shSize.value,
-        shPrice: shPrice.value,
-        surfactantSize: surfactantSize.value,
-        surfactantPrice: surfactantPrice.value,
-        scentSize: scentSize.value,
-        scentPrice: scentPrice.value
-      }));
+          <div></div><div>Water</div><div>${water.toFixed(2)}L</div>
+          <div></div><div>SH</div><div>${shVol.toFixed(2)}L</div>
+          <div></div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
+          <div></div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
+        </div>`;
     }
 
-    function restoreValues() {
-      const saved = localStorage.getItem('batchCalcSettings');
-      if (!saved) return;
-      const data = JSON.parse(saved);
-      volume.value = data.volume || volume.value;
-      sh.value = data.sh || sh.value;
-      surfactant.value = data.surfactant || surfactant.value;
-      scent.value = data.scent || scent.value;
-      stockSHInput.value = data.stockSH || stockSHInput.value;
-      shSize.value = data.shSize || shSize.value;
-      shPrice.value = data.shPrice || shPrice.value;
-      surfactantSize.value = data.surfactantSize || surfactantSize.value;
-      surfactantPrice.value = data.surfactantPrice || surfactantPrice.value;
-      scentSize.value = data.scentSize || scentSize.value;
-      scentPrice.value = data.scentPrice || scentPrice.value;
+    function enableScrollDetection(container) {
+      let timeout;
+      container.addEventListener("scroll", () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => calculate(), 200);
+      });
     }
 
-    function addChangeListener(el) {
-      el.addEventListener('change', calculate);
-      el.addEventListener('input', calculate);
-    }
+    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
+    createOptionList(shList, [...Array(56)].map((_, i) => (0.5 + i * 0.1).toFixed(1)), "%");
+    createOptionList(surfactantList, [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333], "");
+    createOptionList(scentList, [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333], "");
 
-    window.onload = () => {
-      populateSHOptions();
-      restoreValues();
-      [volume, sh, surfactant, scent,
-       stockSHInput, shSize, shPrice,
-       surfactantSize, surfactantPrice,
-       scentSize, scentPrice].forEach(addChangeListener);
-      calculate();
-    };
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW registered'))
-        .catch(err => console.error('SW registration failed:', err));
-    }
+    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
   </script>
 </body>
 </html>
