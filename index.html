@@ -1,104 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2c3e50" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f8f8; }
-    nav { background: #2c3e50; padding: 10px; display: flex; justify-content: space-around; color: white; }
-    nav button { background: none; border: none; color: white; font-size: 16px; }
-    .container { padding: 20px; }
-    .section { display: none; }
-    .section.active { display: block; }
-    label { display: block; margin-top: 10px; }
-    input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; }
-    .result { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1em;
+      font-size: 1.5em;
+    }
+    .dial-container {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+      margin: 2em auto;
+      flex-wrap: wrap;
+    }
+    .dial {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      border-radius: 10px;
+      padding: 1em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    select {
+      font-size: 1.2em;
+      padding: 0.5em;
+    }
+    .result {
+      margin-top: 2em;
+      font-size: 1.2em;
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
-  <nav>
-    <button onclick="showSection('mix')">Mix Calculator</button>
-    <button onclick="showSection('remix')">Remix Calculator</button>
-    <button onclick="showSection('guide')">Surface Guide</button>
-    <button onclick="showSection('settings')">Settings</button>
-  </nav>
+  <header>BatchCalculator</header>
 
-  <div class="container">
-    <div id="mix" class="section active">
-      <h2>Mix Calculator</h2>
-      <label>Desired SH % (e.g. 3)</label>
-      <input type="number" id="desiredSH" step="0.1" />
-      <label>Strength of SH on hand (e.g. 12.5)</label>
-      <input type="number" id="shStrength" step="0.1" />
-      <label>Total batch size (<span id="unitLabel">gallons</span>)</label>
-      <input type="number" id="batchSize" />
-      <label>Surfactant amount (optional %)</label>
-      <input type="number" id="surfactant" step="0.1" />
-      <div class="result" id="mixResult"></div>
+  <div class="dial-container">
+    <div class="dial">
+      <label for="volume">Volume (L)</label>
+      <select id="volume">
+        <!-- 5 to 200 litres -->
+        <script>
+          for (let i = 5; i <= 200; i += 5) {
+            document.write(`<option value="${i}">${i}L</option>`);
+          }
+        </script>
+      </select>
     </div>
 
-    <div id="remix" class="section">
-      <h2>Remix Calculator (Coming Soon)</h2>
+    <div class="dial">
+      <label for="sh">SH %</label>
+      <select id="sh">
+        <!-- 0.5% to 6% -->
+        <script>
+          for (let i = 0.5; i <= 6; i += 0.1) {
+            document.write(`<option value="${i.toFixed(1)}">${i.toFixed(1)}%</option>`);
+          }
+        </script>
+      </select>
     </div>
 
-    <div id="guide" class="section">
-      <h2>Surface Guide (Coming Soon)</h2>
-    </div>
-
-    <div id="settings" class="section">
-      <h2>Settings</h2>
-      <button onclick="toggleUnits()">Switch Units</button>
-      <p>Current unit: <strong id="currentUnit">gallons</strong></p>
+    <div class="dial">
+      <label for="surfactant">Surfactant %</label>
+      <select id="surfactant">
+        <!-- 0% to 5% -->
+        <script>
+          for (let i = 0; i <= 5; i += 0.5) {
+            document.write(`<option value="${i}">${i}%</option>`);
+          }
+        </script>
+      </select>
     </div>
   </div>
 
+  <div class="result" id="output">
+    Select values to see the mix breakdown.
+  </div>
+
   <script>
-    let unit = 'gallons';
+    const volume = document.getElementById('volume');
+    const sh = document.getElementById('sh');
+    const surfactant = document.getElementById('surfactant');
+    const output = document.getElementById('output');
 
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
+    function calculate() {
+      const total = parseFloat(volume.value);
+      const desiredSH = parseFloat(sh.value);
+      const surfPct = parseFloat(surfactant.value);
+      const stockSH = 12.5; // assumed stock strength
 
-    function toggleUnits() {
-      unit = unit === 'gallons' ? 'liters' : 'gallons';
-      document.getElementById('currentUnit').innerText = unit;
-      document.getElementById('unitLabel').innerText = unit;
-    }
+      const shVolume = (desiredSH / stockSH) * total;
+      const surfVolume = (surfPct / 100) * total;
+      const waterVolume = total - shVolume - surfVolume;
 
-    document.querySelectorAll('#desiredSH, #shStrength, #batchSize, #surfactant').forEach(input => {
-      input.addEventListener('input', calculateMix);
-    });
-
-    function calculateMix() {
-      const desiredSH = parseFloat(document.getElementById('desiredSH').value);
-      const shStrength = parseFloat(document.getElementById('shStrength').value);
-      const batchSize = parseFloat(document.getElementById('batchSize').value);
-      const surfactantPercent = parseFloat(document.getElementById('surfactant').value);
-
-      if (!desiredSH || !shStrength || !batchSize) return;
-
-      const shAmount = (desiredSH / shStrength) * batchSize;
-      const waterAmount = batchSize - shAmount;
-      const surfactantAmount = surfactantPercent ? (surfactantPercent / 100) * batchSize : 0;
-
-      const result = `
-        <strong>SH Needed:</strong> ${shAmount.toFixed(2)} ${unit}<br/>
-        <strong>Water Needed:</strong> ${(waterAmount - surfactantAmount).toFixed(2)} ${unit}<br/>
-        <strong>Surfactant:</strong> ${surfactantAmount.toFixed(2)} ${unit}
+      output.innerHTML = `
+        <strong>SH:</strong> ${shVolume.toFixed(2)}L<br>
+        <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
+        <strong>Surfactant:</strong> ${surfVolume.toFixed(2)}L
       `;
-      document.getElementById('mixResult').innerHTML = result;
     }
 
-    // PWA service worker registration
+    volume.addEventListener('change', calculate);
+    sh.addEventListener('change', calculate);
+    surfactant.addEventListener('change', calculate);
+  </script>
+
+  <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('Service Worker registered'))
-        .catch(err => console.error('Service Worker failed:', err));
+        .then(() => console.log('SW registered'))
+        .catch(err => console.error('SW registration failed:', err));
     }
   </script>
 </body>
