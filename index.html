@@ -238,12 +238,15 @@
       const surfCost = (parseFloat(document.getElementById('surfactantPrice').value) / parseFloat(document.getElementById('surfactantSize').value)) * surfVolume;
       const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
 
+      const totalCost = shCost + surfCost + scentCost;
+
       output.innerHTML = `
         <div class="result-table">
           <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
+          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
           <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
           <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
-          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
+          <div>$${totalCost.toFixed(2)}</div><div><strong>Total</strong></div><div><strong>${total.toFixed(2)}L</strong></div>
         </div>
       `;
     }
