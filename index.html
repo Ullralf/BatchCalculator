@@ -1,276 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchCalculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chemical Cost Calculator</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
       text-align: center;
     }
-    header {
+    h1 {
       background-color: #2c3e50;
       color: white;
+      margin: 0;
       padding: 1em;
-      font-size: 1.5em;
-      position: relative;
     }
-    .settings-icon {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-    .lock-btn {
-      position: absolute;
-      top: 1em;
-      left: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: white;
-    }
-    .dial-container {
-      display: flex;
-      justify-content: center;
-      gap: 1em;
-      margin: 2em auto;
-      flex-wrap: wrap;
-    }
-    .dial {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .section {
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 600px;
       background: white;
       border-radius: 10px;
-      padding: 1em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    select {
-      font-size: 1.2em;
-      padding: 0.5em;
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 1em;
+      font-size: 1em;
     }
-    .result {
-      margin-top: 2em;
-      font-size: 1.2em;
-      background: white;
-      padding: 1em;
-      border-radius: 10px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .result-table {
+    .output-grid {
       display: grid;
       grid-template-columns: auto auto auto;
-      gap: 0.5em 2em;
-      text-align: left;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
+      gap: 0.5em 1em;
       justify-content: center;
-      align-items: center;
+      margin-top: 1em;
     }
-    .modal-content {
-      background: white;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      max-width: 90vw;
-    }
-    .modal-content input {
-      margin-bottom: 1em;
+    .bold {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
-    BatchCalculator
-    <span class="settings-icon" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</span>
-  </header>
+  <h1>Softwash Mix & Cost Calculator</h1>
 
-  <div class="dial-container">
-    <div class="dial">
-      <label for="volume">Volume (L)</label>
-      <select id="volume">
-        <script>
-          for (let i = 5; i <= 200; i += 5) {
-            document.write(`<option value="${i}">${i}L</option>`);
-          }
-          document.write(`<option value="500">500L</option>`);
-          document.write(`<option value="1000">1000L</option>`);
-        </script>
-      </select>
-    </div>
+  <div class="section">
+    <label for="volume">Volume (L):</label>
+    <select id="volume">
+      <script>
+        for (let i = 5; i <= 200; i += 5) {
+          document.write(`<option value="${i}">${i}L</option>`);
+        }
+        document.write(`<option value="500">500L</option>`);
+        document.write(`<option value="1000">1000L</option>`);
+      </script>
+    </select>
 
-    <div class="dial">
-      <label for="sh">SH %</label>
-      <select id="sh"></select>
-    </div>
+    <label for="sh">Target SH %:</label>
+    <select id="sh"></select>
 
-    <div class="dial">
-      <label for="surfactant">Surfactant Ratio</label>
-      <select id="surfactant">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133" selected>1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
-    </div>
+    <label for="surfactant">Surfactant Ratio:</label>
+    <select id="surfactant">
+      <option value="0.001">1:1000</option>
+      <option value="0.002">1:500</option>
+      <option value="0.01">1:100</option>
+      <option value="0.0133" selected>1:75</option>
+      <option value="0.0167">1:60</option>
+      <option value="0.02">1:50</option>
+      <option value="0.025">1:40</option>
+      <option value="0.0333">1:30</option>
+    </select>
 
-    <div class="dial">
-      <label for="scent">Scent Ratio</label>
-      <select id="scent">
-        <option value="0.001">1:1000</option>
-        <option value="0.002">1:500</option>
-        <option value="0.01">1:100</option>
-        <option value="0.0133" selected>1:75</option>
-        <option value="0.0167">1:60</option>
-        <option value="0.02">1:50</option>
-        <option value="0.025">1:40</option>
-        <option value="0.0333">1:30</option>
-      </select>
-    </div>
+    <label for="scent">Scent Ratio:</label>
+    <select id="scent">
+      <option value="0.001">1:1000</option>
+      <option value="0.002">1:500</option>
+      <option value="0.01">1:100</option>
+      <option value="0.0133" selected>1:75</option>
+      <option value="0.0167">1:60</option>
+      <option value="0.02">1:50</option>
+      <option value="0.025">1:40</option>
+      <option value="0.0333">1:30</option>
+    </select>
+
+    <label for="stockSH">Stock SH Strength (%):</label>
+    <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1">
   </div>
 
-  <div class="result" id="output">
-    Select values to see the mix breakdown.
+  <div class="section">
+    <h2>Mix Output</h2>
+    <div id="mixOutput">Select values to see the mix breakdown.</div>
   </div>
 
-  <div id="settingsModal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <h3>Settings</h3>
-      <label for="stockSH">Stock SH Strength (%):</label>
-      <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1" onchange="calculate()">
+  <div class="section">
+    <h2>Cost Calculation</h2>
+    <label for="shSize">SH Container Size (L):</label>
+    <input type="number" id="shSize" value="20">
+    <label for="shPrice">SH Price ($):</label>
+    <input type="number" id="shPrice" value="80">
 
-      <h4>Cost Calculations</h4>
-      <div>
-        <label>SH Container Size (L):</label>
-        <input type="number" id="shSize" value="20">
-        <label>Price ($):</label>
-        <input type="number" id="shPrice" value="80">
-      </div>
-      <div>
-        <label>Surfactant Container Size (L):</label>
-        <input type="number" id="surfactantSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="surfactantPrice" value="50">
-      </div>
-      <div>
-        <label>Scent Container Size (L):</label>
-        <input type="number" id="scentSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="scentPrice" value="50">
-      </div>
-    </div>
+    <label for="surfactantSize">Surfactant Container Size (L):</label>
+    <input type="number" id="surfactantSize" value="5">
+    <label for="surfactantPrice">Surfactant Price ($):</label>
+    <input type="number" id="surfactantPrice" value="50">
+
+    <label for="scentSize">Scent Container Size (L):</label>
+    <input type="number" id="scentSize" value="5">
+    <label for="scentPrice">Scent Price ($):</label>
+    <input type="number" id="scentPrice" value="50">
+
+    <div id="costOutput"></div>
   </div>
 
   <script>
-    let isLocked = false;
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
+    const shSelect = document.getElementById('sh');
+    for (let i = 0.5; i <= 6; i += 0.1) {
+      const option = document.createElement('option');
+      option.value = i.toFixed(1);
+      option.textContent = `${i.toFixed(1)}%`;
+      shSelect.appendChild(option);
     }
 
-    function handleChangeWrapper(handler) {
-      return function(e) {
-        if (isLocked) {
-          alert('The calculator is locked. Unlock to make changes.');
-          e.target.selectedIndex = e.target.dataset.lastIndex || 0;
-          return;
-        }
-        e.target.dataset.lastIndex = e.target.selectedIndex;
-        handler();
-      };
-    }
-
-    const volume = document.getElementById('volume');
-    const sh = document.getElementById('sh');
-    const surfactant = document.getElementById('surfactant');
-    const scent = document.getElementById('scent');
-    const output = document.getElementById('output');
-    const stockSHInput = document.getElementById('stockSH');
-
-    function populateSHOptions() {
-      for (let i = 0.5; i <= 6; i += 0.1) {
-        const option = document.createElement('option');
-        option.value = i.toFixed(1);
-        option.textContent = `${i.toFixed(1)}%`;
-        sh.appendChild(option);
-      }
-    }
+    const inputs = [
+      'volume', 'sh', 'surfactant', 'scent', 'stockSH',
+      'shSize', 'shPrice', 'surfactantSize', 'surfactantPrice',
+      'scentSize', 'scentPrice'
+    ];
+    inputs.forEach(id => {
+      document.getElementById(id).addEventListener('input', calculate);
+    });
 
     function calculate() {
-      if (isLocked) return;
-      const total = parseFloat(volume.value);
-      const desiredSH = parseFloat(sh.value);
-      const surfRatio = parseFloat(surfactant.value);
-      const scentRatio = parseFloat(scent.value);
-      const stockSH = parseFloat(stockSHInput.value);
+      const total = parseFloat(document.getElementById('volume').value);
+      const desiredSH = parseFloat(document.getElementById('sh').value);
+      const surfRatio = parseFloat(document.getElementById('surfactant').value);
+      const scentRatio = parseFloat(document.getElementById('scent').value);
+      const stockSH = parseFloat(document.getElementById('stockSH').value);
 
       const shVolume = (desiredSH / stockSH) * total;
       const surfVolume = surfRatio * total;
       const scentVolume = scentRatio * total;
       const waterVolume = total - shVolume - surfVolume - scentVolume;
 
+      const mixOutput = `
+        <div class="output-grid">
+          <div class="bold">Chemical</div><div class="bold">Amount</div>
+          <div>SH</div><div>${shVolume.toFixed(2)} L</div>
+          <div>Surfactant</div><div>${surfVolume.toFixed(2)} L</div>
+          <div>Scent</div><div>${scentVolume.toFixed(2)} L</div>
+          <div>Water</div><div>${waterVolume.toFixed(2)} L</div>
+          <div class="bold">Total</div><div class="bold">${total.toFixed(2)} L</div>
+        </div>`;
+      document.getElementById('mixOutput').innerHTML = mixOutput;
+
       const shCost = (parseFloat(document.getElementById('shPrice').value) / parseFloat(document.getElementById('shSize').value)) * shVolume;
       const surfCost = (parseFloat(document.getElementById('surfactantPrice').value) / parseFloat(document.getElementById('surfactantSize').value)) * surfVolume;
       const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
-
       const totalCost = shCost + surfCost + scentCost;
 
-      output.innerHTML = `
-        <div class="result-table">
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
-          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
-
-          <div>$${totalCost.toFixed(2)}</div><div><strong>Total</strong></div><div><strong>${total.toFixed(2)}L</strong></div>
-        </div>
-      `;
+      const costOutput = `
+        <div class="output-grid">
+          <div class="bold">Chemical</div><div class="bold">Cost</div>
+          <div>SH</div><div>$${shCost.toFixed(2)}</div>
+          <div>Surfactant</div><div>$${surfCost.toFixed(2)}</div>
+          <div>Scent</div><div>$${scentCost.toFixed(2)}</div>
+          <div class="bold">Total</div><div class="bold">$${totalCost.toFixed(2)}</div>
+        </div>`;
+      document.getElementById('costOutput').innerHTML = costOutput;
     }
 
-    volume.addEventListener('change', handleChangeWrapper(calculate));
-    sh.addEventListener('change', handleChangeWrapper(calculate));
-    surfactant.addEventListener('change', handleChangeWrapper(calculate));
-    scent.addEventListener('change', handleChangeWrapper(calculate));
-
-    window.onload = () => {
-      populateSHOptions();
-      document.getElementById('surfactant').selectedIndex = 3;
-      document.getElementById('scent').selectedIndex = 3;
-      calculate();
-    };
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW registered'))
-        .catch(err => console.error('SW registration failed:', err));
-    }
+    window.onload = calculate;
   </script>
 </body>
 </html>
