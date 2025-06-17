@@ -68,21 +68,6 @@
       margin-left: auto;
       margin-right: auto;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .result .price {
-      text-align: left;
-      flex: 1;
-    }
-    .result .chemical {
-      text-align: center;
-      flex: 2;
-    }
-    .result .volume {
-      text-align: right;
-      flex: 1;
     }
     .modal {
       display: none;
@@ -144,7 +129,6 @@
         <option value="0.02">1:50</option>
         <option value="0.025">1:40</option>
         <option value="0.0333">1:30</option>
-        <option value="0.00">1:0</option>
       </select>
     </div>
 
@@ -159,13 +143,12 @@
         <option value="0.02">1:50</option>
         <option value="0.025">1:40</option>
         <option value="0.0333">1:30</option>
-        <option value="0.0">1:0</option>
       </select>
     </div>
   </div>
 
   <div class="result" id="output">
-    <div class="price">Select values to see the mix breakdown.</div>
+    Select values to see the mix breakdown.
   </div>
 
   <div id="settingsModal" class="modal" onclick="this.style.display='none'">
@@ -250,9 +233,10 @@
       const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
 
       output.innerHTML = `
-        <div class="price">$${shCost.toFixed(2)} SH ${shVolume.toFixed(2)}L</div>
-        <div class="chemical">$${surfCost.toFixed(2)} Surfactant ${surfVolume.toFixed(2)}L</div>
-        <div class="volume">$${scentCost.toFixed(2)} Scent ${scentVolume.toFixed(2)}L</div>
+        <strong>$${shCost.toFixed(2)} SH ${shVolume.toFixed(2)}L</strong><br>
+        <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
+        <strong>$${surfCost.toFixed(2)} Surfactant ${surfVolume.toFixed(2)}L</strong><br>
+        <strong>$${scentCost.toFixed(2)} Scent ${scentVolume.toFixed(2)}L</strong>
       `;
     }
 
