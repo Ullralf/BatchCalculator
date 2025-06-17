@@ -1,246 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchCalculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
-    }
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 1em;
-      font-size: 1.5em;
-      position: relative;
-    }
-    .settings-icon {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-    .lock-btn {
-      position: absolute;
-      top: 1em;
-      left: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: white;
-    }
-    .dial-container {
-      display: flex;
-      justify-content: space-between;
-      gap: 1em;
-      margin: 2em auto;
-      flex-wrap: wrap;
-      max-width: 1000px;
-      padding: 0 1em;
-    }
-    .dial {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      padding: 1em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      flex: 1;
-      margin: 0 5px;
-      height: 150px;
-      position: relative;
-    }
-    .dial .value {
-      font-size: 2em;
-      margin-top: 20px;
-    }
-    select {
-      font-size: 1.2em;
-      padding: 0.5em;
-    }
-    .result {
-      margin-top: 2em;
-      font-size: 1.2em;
-      background: white;
-      padding: 1em;
-      border-radius: 10px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      margin-bottom: 2em;
-    }
-    .result-table {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      gap: 0.5em 2em;
-      text-align: left;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      max-width: 90vw;
-    }
-    .modal-content input {
-      margin-bottom: 1em;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
-    BatchCalculator
-    <span class="settings-icon" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</span>
-  </header>
+.dial-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: 0.5em;
+  margin: 1em auto;
+  gap: 0.5em;
+  flex-wrap: nowrap;
+}
 
-  <div class="dial-container">
-    <div class="dial" id="volumeDial" data-values="5,10,15,20,25,30,35,40,50,100,200,500,1000">
-      <label for="volume">Volume (L)</label>
-      <div class="value">5</div>
-    </div>
+.dial {
+  flex: 0 0 auto;
+  background: white;
+  border-radius: 8px;
+  padding: 0.5em;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  width: 80px;
+  text-align: center;
+}
 
-    <div class="dial" id="shDial" data-values="0.5,1,1.5,2,2.5,3,3.5,4,5,10,15,20">
-      <label for="sh">SH %</label>
-      <div class="value">0.5</div>
-    </div>
+.dial label {
+  font-size: 0.8em;
+  margin-bottom: 0.4em;
+  display: block;
+}
 
-    <div class="dial" id="surfactantDial" data-values="0.001,0.002,0.01,0.0133,0.0167,0.02,0.025,0.0333">
-      <label for="surfactant">Surfactant Ratio</label>
-      <div class="value">0.001</div>
-    </div>
+select {
+  font-size: 1.2em;
+  padding: 0.3em;
+  height: 120px;
+  overflow-y: scroll;
+  text-align: center;
+  writing-mode: vertical-lr;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  scroll-snap-type: y mandatory;
+}
 
-    <div class="dial" id="scentDial" data-values="0.001,0.002,0.01,0.0133,0.0167,0.02,0.025,0.0333">
-      <label for="scent">Scent Ratio</label>
-      <div class="value">0.001</div>
-    </div>
-  </div>
+select option {
+  height: 40px;
+  scroll-snap-align: center;
+}
 
-  <div class="result" id="output">Select values to see the mix breakdown.</div>
+select::-webkit-scrollbar {
+  display: none;
+}
 
-  <div id="settingsModal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <h3>Settings</h3>
-      <label for="stockSH">Stock SH Strength (%):</label>
-      <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1">
-
-      <h4>Cost Calculations</h4>
-      <div>
-        <label>SH Container Size (L):</label>
-        <input type="number" id="shSize" value="20">
-        <label>Price ($):</label>
-        <input type="number" id="shPrice" value="80">
-      </div>
-      <div>
-        <label>Surfactant Container Size (L):</label>
-        <input type="number" id="surfactantSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="surfactantPrice" value="50">
-      </div>
-      <div>
-        <label>Scent Container Size (L):</label>
-        <input type="number" id="scentSize" value="5">
-        <label>Price ($):</label>
-        <input type="number" id="scentPrice" value="50">
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let isLocked = false;
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
-    }
-
-    function handleTouchEvent(event, el, values) {
-      const touch = event.touches[0];
-      const rect = el.getBoundingClientRect();
-      const posY = touch.clientY - rect.top;
-      const dialHeight = el.offsetHeight;
-      const valueIndex = Math.floor(posY / (dialHeight / values.length));
-
-      // Update the dial value
-      el.querySelector('.value').textContent = values[valueIndex];
-      el.dataset.value = values[valueIndex];
-
-      // Prevent the default behavior to stop page refresh
-      event.preventDefault();
-    }
-
-    function addTouchEvents() {
-      const dials = document.querySelectorAll('.dial');
-
-      dials.forEach(dial => {
-        const values = dial.dataset.values.split(',');
-
-        dial.addEventListener('touchstart', function (e) {
-          e.preventDefault(); // Prevent default touch behavior (like scrolling)
-        });
-
-        dial.addEventListener('touchmove', function (e) {
-          handleTouchEvent(e, dial, values);
-        });
-      });
-    }
-
-    function calculate() {
-      if (isLocked) return;
-      const volume = parseFloat(document.getElementById('volumeDial').dataset.value);
-      const sh = parseFloat(document.getElementById('shDial').dataset.value);
-      const surfactant = parseFloat(document.getElementById('surfactantDial').dataset.value);
-      const scent = parseFloat(document.getElementById('scentDial').dataset.value);
-      const stockSH = parseFloat(document.getElementById('stockSH').value);
-
-      const shVolume = (sh / stockSH) * volume;
-      const surfVolume = surfactant * volume;
-      const scentVolume = scent * volume;
-      const waterVolume = volume - shVolume - surfVolume - scentVolume;
-
-      const shCost = (parseFloat(document.getElementById('shPrice').value) / parseFloat(document.getElementById('shSize').value)) * shVolume;
-      const surfCost = (parseFloat(document.getElementById('surfactantPrice').value) / parseFloat(document.getElementById('surfactantSize').value)) * surfVolume;
-      const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
-
-      const totalCost = shCost + surfCost + scentCost;
-
-      document.getElementById('output').innerHTML = `
-        <div class="result-table">
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
-          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
-          <div>$${totalCost.toFixed(2)}</div><div><strong>Total</strong></div><div><strong>${volume.toFixed(2)}L</strong></div>
-        </div>
-      `;
-    }
-
-    window.onload = () => {
-      addTouchEvents();
-      calculate();
-    };
-  </script>
-</body>
-</html>
+.result {
+  margin-top: 1em;
+  font-size: 1.2em;
+  background: white;
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
