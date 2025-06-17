@@ -112,13 +112,7 @@
 
     <div class="dial">
       <label for="sh">SH %</label>
-      <select id="sh">
-        <script>
-          for (let i = 0.5; i <= 6; i += 0.1) {
-            document.write(`<option value="${i.toFixed(1)}">${i.toFixed(1)}%</option>`);
-          }
-        </script>
-      </select>
+      <select id="sh"></select>
     </div>
 
     <div class="dial">
@@ -170,12 +164,33 @@
       document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
     }
 
+    function handleChangeWrapper(handler) {
+      return function(e) {
+        if (isLocked) {
+          alert('The calculator is locked. Unlock to make changes.');
+          e.target.selectedIndex = e.target.dataset.lastIndex || 0;
+          return;
+        }
+        e.target.dataset.lastIndex = e.target.selectedIndex;
+        handler();
+      };
+    }
+
     const volume = document.getElementById('volume');
     const sh = document.getElementById('sh');
     const surfactant = document.getElementById('surfactant');
     const scent = document.getElementById('scent');
     const output = document.getElementById('output');
     const stockSHInput = document.getElementById('stockSH');
+
+    function populateSHOptions() {
+      for (let i = 0.5; i <= 6; i += 0.1) {
+        const option = document.createElement('option');
+        option.value = i.toFixed(1);
+        option.textContent = `${i.toFixed(1)}%`;
+        sh.appendChild(option);
+      }
+    }
 
     function calculate() {
       if (isLocked) return;
@@ -198,12 +213,13 @@
       `;
     }
 
-    volume.addEventListener('change', calculate);
-    sh.addEventListener('change', calculate);
-    surfactant.addEventListener('change', calculate);
-    scent.addEventListener('change', calculate);
+    volume.addEventListener('change', handleChangeWrapper(calculate));
+    sh.addEventListener('change', handleChangeWrapper(calculate));
+    surfactant.addEventListener('change', handleChangeWrapper(calculate));
+    scent.addEventListener('change', handleChangeWrapper(calculate));
 
     window.onload = () => {
+      populateSHOptions();
       document.getElementById('surfactant').selectedIndex = 3;
       document.getElementById('scent').selectedIndex = 3;
       calculate();
