@@ -55,6 +55,7 @@
       padding: 0.5em;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       width: 80px;
+      position: relative;
     }
     .dial label {
       margin-bottom: 0.5em;
@@ -65,6 +66,7 @@
       scroll-snap-type: y mandatory;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      position: relative;
     }
     .scroll-list::-webkit-scrollbar {
       display: none;
@@ -73,6 +75,13 @@
       scroll-snap-align: center;
       font-size: 1.2em;
       padding: 0.5em;
+      opacity: 0.4;
+      transition: opacity 0.2s ease;
+    }
+    .scroll-item.selected {
+      font-weight: bold;
+      color: #2c3e50;
+      opacity: 1;
     }
     .result {
       margin-top: 1em;
@@ -138,20 +147,28 @@
     }
 
     function getCenterValue(container) {
-      const center = container.scrollTop + container.clientHeight / 2;
+      const containerRect = container.getBoundingClientRect();
+      const centerY = containerRect.top + container.clientHeight / 2;
       const items = container.querySelectorAll(".scroll-item");
       let closest = null;
       let minDist = Infinity;
+
       items.forEach(item => {
-        const box = item.getBoundingClientRect();
-        const itemCenter = box.top + box.height / 2;
-        const dist = Math.abs(itemCenter - (window.innerHeight / 2));
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(centerY - itemCenter);
         if (dist < minDist) {
           minDist = dist;
           closest = item;
         }
+        item.classList.remove("selected");
       });
-      return closest ? parseFloat(closest.dataset.value) : null;
+
+      if (closest) {
+        closest.classList.add("selected");
+        return parseFloat(closest.dataset.value);
+      }
+      return null;
     }
 
     function calculate() {
