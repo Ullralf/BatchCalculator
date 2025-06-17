@@ -19,6 +19,14 @@
       color: white;
       padding: 1em;
       font-size: 1.5em;
+      position: relative;
+    }
+    .settings-icon {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      font-size: 1.2em;
+      cursor: pointer;
     }
     .dial-container {
       display: flex;
@@ -51,20 +59,42 @@
       margin-right: auto;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      max-width: 90vw;
+    }
   </style>
 </head>
 <body>
-  <header>BatchCalculator</header>
+  <header>
+    BatchCalculator
+    <span class="settings-icon" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</span>
+  </header>
 
   <div class="dial-container">
     <div class="dial">
       <label for="volume">Volume (L)</label>
       <select id="volume">
-        <!-- 5 to 200 litres -->
         <script>
           for (let i = 5; i <= 200; i += 5) {
             document.write(`<option value="${i}">${i}L</option>`);
           }
+          document.write(`<option value="500">500L</option>`);
+          document.write(`<option value="1000">1000L</option>`);
         </script>
       </select>
     </div>
@@ -72,7 +102,6 @@
     <div class="dial">
       <label for="sh">SH %</label>
       <select id="sh">
-        <!-- 0.5% to 6% -->
         <script>
           for (let i = 0.5; i <= 6; i += 0.1) {
             document.write(`<option value="${i.toFixed(1)}">${i.toFixed(1)}%</option>`);
@@ -82,14 +111,14 @@
     </div>
 
     <div class="dial">
-      <label for="surfactant">Surfactant %</label>
+      <label for="surfactant">Surfactant Ratio (e.g. 1:75)</label>
       <select id="surfactant">
-        <!-- 0% to 5% -->
-        <script>
-          for (let i = 0; i <= 5; i += 0.5) {
-            document.write(`<option value="${i}">${i}%</option>`);
-          }
-        </script>
+        <option value="0.01">1:100</option>
+        <option value="0.0133" selected>1:75</option>
+        <option value="0.0167">1:60</option>
+        <option value="0.02">1:50</option>
+        <option value="0.025">1:40</option>
+        <option value="0.0333">1:30</option>
       </select>
     </div>
   </div>
@@ -98,20 +127,29 @@
     Select values to see the mix breakdown.
   </div>
 
+  <div id="settingsModal" class="modal" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3>Settings</h3>
+      <label for="stockSH">Stock SH Strength (%):</label>
+      <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1" onchange="calculate()">
+    </div>
+  </div>
+
   <script>
     const volume = document.getElementById('volume');
     const sh = document.getElementById('sh');
     const surfactant = document.getElementById('surfactant');
     const output = document.getElementById('output');
+    const stockSHInput = document.getElementById('stockSH');
 
     function calculate() {
       const total = parseFloat(volume.value);
       const desiredSH = parseFloat(sh.value);
-      const surfPct = parseFloat(surfactant.value);
-      const stockSH = 12.5; // assumed stock strength
+      const surfRatio = parseFloat(surfactant.value);
+      const stockSH = parseFloat(stockSHInput.value);
 
       const shVolume = (desiredSH / stockSH) * total;
-      const surfVolume = (surfPct / 100) * total;
+      const surfVolume = surfRatio * total;
       const waterVolume = total - shVolume - surfVolume;
 
       output.innerHTML = `
@@ -124,6 +162,11 @@
     volume.addEventListener('change', calculate);
     sh.addEventListener('change', calculate);
     surfactant.addEventListener('change', calculate);
+
+    window.onload = () => {
+      document.getElementById('surfactant').selectedIndex = 1;
+      calculate();
+    };
   </script>
 
   <script>
