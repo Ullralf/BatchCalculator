@@ -28,6 +28,16 @@
       font-size: 1.2em;
       cursor: pointer;
     }
+    .lock-btn {
+      position: absolute;
+      top: 1em;
+      left: 1em;
+      font-size: 1.2em;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
+    }
     .dial-container {
       display: flex;
       justify-content: center;
@@ -81,6 +91,7 @@
 </head>
 <body>
   <header>
+    <button class="lock-btn" onclick="toggleLock()">🔓</button>
     BatchCalculator
     <span class="settings-icon" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</span>
   </header>
@@ -113,6 +124,8 @@
     <div class="dial">
       <label for="surfactant">Surfactant Ratio</label>
       <select id="surfactant">
+        <option value="0.001">1:1000</option>
+        <option value="0.002">1:500</option>
         <option value="0.01">1:100</option>
         <option value="0.0133" selected>1:75</option>
         <option value="0.0167">1:60</option>
@@ -125,6 +138,8 @@
     <div class="dial">
       <label for="scent">Scent Ratio</label>
       <select id="scent">
+        <option value="0.001">1:1000</option>
+        <option value="0.002">1:500</option>
         <option value="0.01">1:100</option>
         <option value="0.0133" selected>1:75</option>
         <option value="0.0167">1:60</option>
@@ -148,6 +163,13 @@
   </div>
 
   <script>
+    let isLocked = false;
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      document.querySelector('.lock-btn').textContent = isLocked ? '🔒' : '🔓';
+    }
+
     const volume = document.getElementById('volume');
     const sh = document.getElementById('sh');
     const surfactant = document.getElementById('surfactant');
@@ -156,6 +178,7 @@
     const stockSHInput = document.getElementById('stockSH');
 
     function calculate() {
+      if (isLocked) return;
       const total = parseFloat(volume.value);
       const desiredSH = parseFloat(sh.value);
       const surfRatio = parseFloat(surfactant.value);
@@ -181,8 +204,8 @@
     scent.addEventListener('change', calculate);
 
     window.onload = () => {
-      document.getElementById('surfactant').selectedIndex = 1;
-      document.getElementById('scent').selectedIndex = 1;
+      document.getElementById('surfactant').selectedIndex = 3;
+      document.getElementById('scent').selectedIndex = 3;
       calculate();
     };
   </script>
