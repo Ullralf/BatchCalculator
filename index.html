@@ -136,12 +136,20 @@
     const surfactantList = document.getElementById("surfactantList");
     const scentList = document.getElementById("scentList");
 
-    function createOptionList(container, options, unit) {
-      options.forEach((val, i) => {
+    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+
+    function formatRatio(value) {
+      const ratio = Math.round(1 / value);
+      return `1:${ratio}`;
+    }
+
+    function createOptionList(container, options, unit, isRatio = false) {
+      options.forEach((val) => {
         const item = document.createElement("div");
         item.className = "scroll-item";
         item.dataset.value = val;
-        item.textContent = val + (unit || "");
+        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
         container.appendChild(item);
       });
     }
@@ -204,8 +212,8 @@
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
     createOptionList(shList, [...Array(56)].map((_, i) => (0.5 + i * 0.1).toFixed(1)), "%");
-    createOptionList(surfactantList, [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333], "");
-    createOptionList(scentList, [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333], "");
+    createOptionList(surfactantList, surfOptions, "", true);
+    createOptionList(scentList, scentOptions, "", true);
 
     [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
   </script>
