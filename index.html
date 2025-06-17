@@ -87,6 +87,9 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       max-width: 90vw;
     }
+    .modal-content input {
+      margin-bottom: 1em;
+    }
   </style>
 </head>
 <body>
@@ -100,44 +103,24 @@
     <div class="dial">
       <label for="volume">Volume (L)</label>
       <select id="volume">
-        <option value="0">0L</option>
-        <option value="5">5L</option>
-        <option value="10">10L</option>
-        <option value="15">15L</option>
-        <option value="20">20L</option>
-        <option value="25">25L</option>
-        <option value="30">30L</option>
-        <option value="35">35L</option>
-        <option value="40">40L</option>
-        <option value="45">45L</option>
-        <option value="50">50L</option>
-        <option value="500">500L</option>
-        <option value="1000">1000L</option>
+        <script>
+          for (let i = 5; i <= 200; i += 5) {
+            document.write(`<option value="${i}">${i}L</option>`);
+          }
+          document.write(`<option value="500">500L</option>`);
+          document.write(`<option value="1000">1000L</option>`);
+        </script>
       </select>
     </div>
 
     <div class="dial">
       <label for="sh">SH %</label>
-      <select id="sh">
-        <option value="0">0%</option>
-        <option value="0.5">0.5%</option>
-        <option value="1">1%</option>
-        <option value="1.5">1.5%</option>
-        <option value="2">2%</option>
-        <option value="2.5">2.5%</option>
-        <option value="3">3%</option>
-        <option value="3.5">3.5%</option>
-        <option value="4">4%</option>
-        <option value="4.5">4.5%</option>
-        <option value="5">5%</option>
-        <option value="6">6%</option>
-      </select>
+      <select id="sh"></select>
     </div>
 
     <div class="dial">
       <label for="surfactant">Surfactant Ratio</label>
       <select id="surfactant">
-        <option value="0">0 (no add)</option>
         <option value="0.001">1:1000</option>
         <option value="0.002">1:500</option>
         <option value="0.01">1:100</option>
@@ -152,7 +135,6 @@
     <div class="dial">
       <label for="scent">Scent Ratio</label>
       <select id="scent">
-        <option value="0">0 (no add)</option>
         <option value="0.001">1:1000</option>
         <option value="0.002">1:500</option>
         <option value="0.01">1:100</option>
@@ -174,6 +156,26 @@
       <h3>Settings</h3>
       <label for="stockSH">Stock SH Strength (%):</label>
       <input type="number" id="stockSH" value="12.5" min="1" max="20" step="0.1" onchange="calculate()">
+
+      <h4>Cost Calculations</h4>
+      <div>
+        <label>SH Container Size (L):</label>
+        <input type="number" id="shSize" value="20">
+        <label>Price ($):</label>
+        <input type="number" id="shPrice" value="80">
+      </div>
+      <div>
+        <label>Surfactant Container Size (L):</label>
+        <input type="number" id="surfactantSize" value="5">
+        <label>Price ($):</label>
+        <input type="number" id="surfactantPrice" value="50">
+      </div>
+      <div>
+        <label>Scent Container Size (L):</label>
+        <input type="number" id="scentSize" value="5">
+        <label>Price ($):</label>
+        <input type="number" id="scentPrice" value="50">
+      </div>
     </div>
   </div>
 
@@ -226,11 +228,15 @@
       const scentVolume = scentRatio * total;
       const waterVolume = total - shVolume - surfVolume - scentVolume;
 
+      const shCost = (parseFloat(document.getElementById('shPrice').value) / parseFloat(document.getElementById('shSize').value)) * shVolume;
+      const surfCost = (parseFloat(document.getElementById('surfactantPrice').value) / parseFloat(document.getElementById('surfactantSize').value)) * surfVolume;
+      const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
+
       output.innerHTML = `
-        <strong>SH:</strong> ${shVolume.toFixed(2)}L<br>
+        <strong>SH:</strong> $${shCost.toFixed(2)} &nbsp; ${shVolume.toFixed(2)}L<br>
         <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
-        <strong>Surfactant:</strong> ${surfVolume.toFixed(2)}L<br>
-        <strong>Scent:</strong> ${scentVolume.toFixed(2)}L
+        <strong>Surfactant:</strong> $${surfCost.toFixed(2)} &nbsp; ${surfVolume.toFixed(2)}L<br>
+        <strong>Scent:</strong> $${scentCost.toFixed(2)} &nbsp; ${scentVolume.toFixed(2)}L
       `;
     }
 
