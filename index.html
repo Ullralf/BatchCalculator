@@ -111,8 +111,20 @@
     </div>
 
     <div class="dial">
-      <label for="surfactant">Surfactant Ratio (e.g. 1:75)</label>
+      <label for="surfactant">Surfactant Ratio</label>
       <select id="surfactant">
+        <option value="0.01">1:100</option>
+        <option value="0.0133" selected>1:75</option>
+        <option value="0.0167">1:60</option>
+        <option value="0.02">1:50</option>
+        <option value="0.025">1:40</option>
+        <option value="0.0333">1:30</option>
+      </select>
+    </div>
+
+    <div class="dial">
+      <label for="scent">Scent Ratio</label>
+      <select id="scent">
         <option value="0.01">1:100</option>
         <option value="0.0133" selected>1:75</option>
         <option value="0.0167">1:60</option>
@@ -139,6 +151,7 @@
     const volume = document.getElementById('volume');
     const sh = document.getElementById('sh');
     const surfactant = document.getElementById('surfactant');
+    const scent = document.getElementById('scent');
     const output = document.getElementById('output');
     const stockSHInput = document.getElementById('stockSH');
 
@@ -146,25 +159,30 @@
       const total = parseFloat(volume.value);
       const desiredSH = parseFloat(sh.value);
       const surfRatio = parseFloat(surfactant.value);
+      const scentRatio = parseFloat(scent.value);
       const stockSH = parseFloat(stockSHInput.value);
 
       const shVolume = (desiredSH / stockSH) * total;
       const surfVolume = surfRatio * total;
-      const waterVolume = total - shVolume - surfVolume;
+      const scentVolume = scentRatio * total;
+      const waterVolume = total - shVolume - surfVolume - scentVolume;
 
       output.innerHTML = `
         <strong>SH:</strong> ${shVolume.toFixed(2)}L<br>
         <strong>Water:</strong> ${waterVolume.toFixed(2)}L<br>
-        <strong>Surfactant:</strong> ${surfVolume.toFixed(2)}L
+        <strong>Surfactant:</strong> ${surfVolume.toFixed(2)}L<br>
+        <strong>Scent:</strong> ${scentVolume.toFixed(2)}L
       `;
     }
 
     volume.addEventListener('change', calculate);
     sh.addEventListener('change', calculate);
     surfactant.addEventListener('change', calculate);
+    scent.addEventListener('change', calculate);
 
     window.onload = () => {
       document.getElementById('surfactant').selectedIndex = 1;
+      document.getElementById('scent').selectedIndex = 1;
       calculate();
     };
   </script>
