@@ -69,6 +69,12 @@
       margin-right: auto;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+    .result-table {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 0.5em 2em;
+      text-align: left;
+    }
     .modal {
       display: none;
       position: fixed;
@@ -233,10 +239,12 @@
       const scentCost = (parseFloat(document.getElementById('scentPrice').value) / parseFloat(document.getElementById('scentSize').value)) * scentVolume;
 
       output.innerHTML = `
-        <strong>Water:${waterVolume.toFixed(2)}L</strong><br>
-        <strong>$${shCost.toFixed(2)} SH ${shVolume.toFixed(2)}L</strong><br>
-        <strong>$${surfCost.toFixed(2)} Surfactant ${surfVolume.toFixed(2)}L</strong><br>
-        <strong>$${scentCost.toFixed(2)} Scent ${scentVolume.toFixed(2)}L</strong>
+        <div class="result-table">
+          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVolume.toFixed(2)}L</div>
+          <div></div><div>Water</div><div>${waterVolume.toFixed(2)}L</div>
+          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVolume.toFixed(2)}L</div>
+          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVolume.toFixed(2)}L</div>
+        </div>
       `;
     }
 
