@@ -82,7 +82,7 @@
       localStorage.setItem('surfactantDrumCost', document.getElementById('surfactantDrumCost').value);
       localStorage.setItem('scentDrumSize', document.getElementById('scentDrumSize').value);
       localStorage.setItem('scentDrumCost', document.getElementById('scentDrumCost').value);
-      alert('Settings saved.');
+      window.location.href = 'index.html'; // Redirect to main calculator
     }
 
     function loadSettings() {
