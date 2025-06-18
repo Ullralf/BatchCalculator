@@ -1,124 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Settings</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 1em;
-      text-align: center;
-    }
-    main {
-      padding: 1em;
-      max-width: 500px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 1em;
-    }
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 1em;
-      margin-top: 2em;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .note {
-      font-size: 0.9em;
-      color: #666;
-      margin-top: 1em;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    Settings
-  </header>
-  <main>
-    <label>SH Strength (%):
-      <input type="number" step="0.1" id="shStrength">
-    </label>
+function calculate() {
+  const volume = getCenterValue(volumeList);
+  const sh = getCenterValue(shList);
+  const surfactant = getCenterValue(surfactantList);
+  const scent = getCenterValue(scentList);
 
-    <label>SH Cost ($):
-      <input type="number" step="0.01" id="shCost">
-    </label>
+  if ([volume, sh, surfactant, scent].includes(null)) return;
 
-    <label>SH Size (L):
-      <input type="number" step="0.1" id="shSize">
-    </label>
+  const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
 
-    <label>Surfactant Cost ($):
-      <input type="number" step="0.01" id="surfCost">
-    </label>
+  const shVol = (sh / stockSH) * volume;
+  const surfVol = surfactant * volume;
+  const scentVol = scent * volume;
+  const water = volume - shVol - surfVol - scentVol;
 
-    <label>Surfactant Size (L):
-      <input type="number" step="0.1" id="surfSize">
-    </label>
+  const shCost = shVol * shCostPerL;
+  const surfCost = surfVol * surfCostPerL;
+  const scentCost = scentVol * scentCostPerL;
 
-    <label>Scent Cost ($):
-      <input type="number" step="0.01" id="scentCost">
-    </label>
+  // Update only the necessary fields
+  document.getElementById("waterVol").textContent = `${water.toFixed(2)}L`;
+  document.getElementById("shVol").textContent = `${shVol.toFixed(2)}L`;
+  document.getElementById("surfVol").textContent = `${surfVol.toFixed(2)}L`;
+  document.getElementById("scentVol").textContent = `${scentVol.toFixed(2)}L`;
 
-    <label>Scent Size (L):
-      <input type="number" step="0.1" id="scentSize">
-    </label>
-
-    <button onclick="saveSettings()">Save Settings</button>
-    <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
-  </main>
-
-  <script>
-    function saveSettings() {
-      const settings = {
-        shStrength: document.getElementById("shStrength").value,
-        shCost: document.getElementById("shCost").value,
-        shSize: document.getElementById("shSize").value,
-        surfCost: document.getElementById("surfCost").value,
-        surfSize: document.getElementById("surfSize").value,
-        scentCost: document.getElementById("scentCost").value,
-        scentSize: document.getElementById("scentSize").value
-      };
-      localStorage.setItem("batchSettings", JSON.stringify(settings));
-      alert("Settings saved!");
-    }
-
-    function loadSettings() {
-      const saved = JSON.parse(localStorage.getItem("batchSettings"));
-      if (!saved) return;
-      document.getElementById("shStrength").value = saved.shStrength || "";
-      document.getElementById("shCost").value = saved.shCost || "";
-      document.getElementById("shSize").value = saved.shSize || "";
-      document.getElementById("surfCost").value = saved.surfCost || "";
-      document.getElementById("surfSize").value = saved.surfSize || "";
-      document.getElementById("scentCost").value = saved.scentCost || "";
-      document.getElementById("scentSize").value = saved.scentSize || "";
-    }
-
-    loadSettings();
-  </script>
-</body>
-</html>
+  document.getElementById("shCost").textContent = `$${shCost.toFixed(2)}`;
+  document.getElementById("surfCost").textContent = `$${surfCost.toFixed(2)}`;
+  document.getElementById("scentCost").textContent = `$${scentCost.toFixed(2)}`;
+}
