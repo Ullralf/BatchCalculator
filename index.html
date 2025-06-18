@@ -104,14 +104,14 @@
 </head>
 <body>
   <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
+    <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
     BatchCalculator
     <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
     <div class="dial">
-      <label>Vol.</label>
+      <label>Vol. (L)</label>
       <div class="scroll-list" id="volumeList"></div>
     </div>
     <div class="dial">
@@ -128,14 +128,7 @@
     </div>
   </div>
 
-  <div class="result" id="output">
-    <div class="result-table">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
-  </div>
+  <div class="result" id="output"></div>
 
   <script>
     const volumeList = document.getElementById("volumeList");
@@ -146,9 +139,10 @@
     const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
     const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
 
+    let locked = false;
+
     function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
+      return value === 0 ? "0" : `1:${Math.round(1 / value)}`;
     }
 
     function createOptionList(container, options, unit, isRatio = false) {
@@ -156,14 +150,6 @@
       hyphenStart.className = "scroll-item";
       hyphenStart.textContent = "-";
       container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = 0;
-        item.textContent = "0";
-        container.appendChild(item);
-      }
 
       options.forEach((val) => {
         const item = document.createElement("div");
@@ -180,26 +166,11 @@
     }
 
     function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
       const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
+      for (const item of items) {
+        if (item.classList.contains("selected")) {
+          return parseFloat(item.dataset.value);
         }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
       }
       return null;
     }
@@ -209,11 +180,11 @@
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
+      const stockSH = parseFloat(localStorage.getItem("stockSH")) || 12.5;
 
-      const shCostPerL = parseFloat(localStorage.getItem('shCost')) || 1.5;
-      const surfCostPerL = parseFloat(localStorage.getItem('surfCost')) || 6.0;
-      const scentCostPerL = parseFloat(localStorage.getItem('scentCost')) || 8.0;
-      const stockSH = parseFloat(localStorage.getItem('stockSH')) || 12.5;
+      const shCostPerL = parseFloat(localStorage.getItem("shCost")) || 1.5;
+      const surfCostPerL = parseFloat(localStorage.getItem("surfCost")) || 6.0;
+      const scentCostPerL = parseFloat(localStorage.getItem("scentCost")) || 8.0;
 
       if ([volume, sh, surfactant, scent].includes(null)) return;
 
@@ -235,20 +206,54 @@
         </div>`;
     }
 
-    function enableScrollDetection(container) {
+    function enableScrollDetection(container, key) {
       let timeout;
       container.addEventListener("scroll", () => {
+        if (locked) return;
         clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
+        timeout = setTimeout(() => {
+          const value = getCenterValue(container);
+          if (value !== null) localStorage.setItem(key, value);
+          calculate();
+        }, 200);
       });
+    }
+
+    function scrollToSaved(container, key) {
+      const value = parseFloat(localStorage.getItem(key));
+      if (isNaN(value)) return;
+      const items = container.querySelectorAll(".scroll-item");
+      for (const item of items) {
+        if (parseFloat(item.dataset.value) === value) {
+          item.scrollIntoView({ block: "center" });
+          break;
+        }
+      }
+    }
+
+    function toggleLock() {
+      locked = !locked;
+      document.getElementById("lockBtn").textContent = locked ? "🔒" : "🔓";
     }
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
     createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
+    createOptionList(surfactantList, [0, ...surfOptions], "", true);
+    createOptionList(scentList, [0, ...scentOptions], "", true);
 
-    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
+    scrollToSaved(volumeList, "volume");
+    scrollToSaved(shList, "sh");
+    scrollToSaved(surfactantList, "surfactant");
+    scrollToSaved(scentList, "scent");
+
+    [
+      [volumeList, "volume"],
+      [shList, "sh"],
+      [surfactantList, "surfactant"],
+      [scentList, "scent"]
+    ].forEach(([list, key]) => enableScrollDetection(list, key));
+
+    setTimeout(() => calculate(), 300);
   </script>
 </body>
 </html>
