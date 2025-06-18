@@ -158,11 +158,11 @@
       container.appendChild(hyphenStart);
 
       if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = 0;
+        item.textContent = "0";
+        container.appendChild(item);
       }
 
       options.forEach((val) => {
@@ -209,11 +209,11 @@
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
-      const stockSH = 12.5;
 
-      const shCostPerL = 1.5;
-      const surfCostPerL = 6.0;
-      const scentCostPerL = 8.0;
+      const shCostPerL = parseFloat(localStorage.getItem('shCost')) || 1.5;
+      const surfCostPerL = parseFloat(localStorage.getItem('surfCost')) || 6.0;
+      const scentCostPerL = parseFloat(localStorage.getItem('scentCost')) || 8.0;
+      const stockSH = parseFloat(localStorage.getItem('stockSH')) || 12.5;
 
       if ([volume, sh, surfactant, scent].includes(null)) return;
 
