@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -212,18 +212,25 @@
       return null;
     }
 
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
+      return {
+        stockSH: parseFloat(settings.shStrength) || 12.5,
+        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
+        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
+        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
+      };
+    }
+
     function calculate() {
       const volume = getCenterValue(volumeList);
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
-      const stockSH = 12.5;
-
-      const shCostPerL = 1.5;
-      const surfCostPerL = 6.0;
-      const scentCostPerL = 8.0;
 
       if ([volume, sh, surfactant, scent].includes(null)) return;
+
+      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
 
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
