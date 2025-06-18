@@ -226,7 +226,7 @@
     }
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(201)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");  // 0.5 step from 0 to 12.5
     createOptionList(surfactantList, [0, ...surfOptions], "", true);
     createOptionList(scentList, [0, ...scentOptions], "", true);
 
