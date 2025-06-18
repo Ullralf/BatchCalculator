@@ -63,16 +63,20 @@
     .scroll-list {
       height: 100px;
       overflow-y: scroll;
-      position: relative;
-      padding: 10px 0;
       scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+    }
+    .scroll-list::-webkit-scrollbar {
+      display: none;
     }
     .scroll-item {
+      scroll-snap-align: center;
       font-size: 1.2em;
       padding: 0.5em;
       opacity: 0.4;
       transition: opacity 0.2s ease;
-      scroll-snap-align: center;
     }
     .scroll-item.selected {
       font-weight: bold;
@@ -102,12 +106,12 @@
   <header>
     <button class="lock-btn" onclick="toggleLock()">🔓</button>
     BatchCalculator
-    <span class="settings-icon" onclick="window.location.href='cost-settings.html'">⚙️</span>
+    <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
     <div class="dial">
-      <label>Volume (L)</label>
+      <label>Vol.</label>
       <div class="scroll-list" id="volumeList"></div>
     </div>
     <div class="dial">
@@ -148,6 +152,19 @@
     }
 
     function createOptionList(container, options, unit, isRatio = false) {
+      const hyphenStart = document.createElement("div");
+      hyphenStart.className = "scroll-item";
+      hyphenStart.textContent = "-";
+      container.appendChild(hyphenStart);
+
+      if (isRatio) {
+        const zeroItem = document.createElement("div");
+        zeroItem.className = "scroll-item";
+        zeroItem.dataset.value = 0;
+        zeroItem.textContent = "0";
+        container.appendChild(zeroItem);
+      }
+
       options.forEach((val) => {
         const item = document.createElement("div");
         item.className = "scroll-item";
@@ -155,6 +172,11 @@
         item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
         container.appendChild(item);
       });
+
+      const hyphenEnd = document.createElement("div");
+      hyphenEnd.className = "scroll-item";
+      hyphenEnd.textContent = "-";
+      container.appendChild(hyphenEnd);
     }
 
     function getCenterValue(container) {
@@ -222,9 +244,9 @@
     }
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(201)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, [0, ...surfOptions], "", true);
-    createOptionList(scentList, [0, ...scentOptions], "", true);
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(surfactantList, surfOptions, "", true);
+    createOptionList(scentList, scentOptions, "", true);
 
     [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
   </script>
