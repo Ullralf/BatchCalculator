@@ -111,7 +111,7 @@
 
   <div class="dial-container">
     <div class="dial">
-      <label>Vol. (L)</label>
+      <label>Volume (L)</label>
       <div class="scroll-list" id="volumeList"></div>
     </div>
     <div class="dial">
@@ -146,14 +146,39 @@
     const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
     const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
 
-    function createOptionList(container, options, unit) {
+    function formatRatio(value) {
+      const ratio = Math.round(1 / value);
+      return `1:${ratio}`;
+    }
+
+    function createOptionList(container, options, unit, isRatio = false) {
+      // Add hyphen at the beginning and end without the unit
+      const hyphenStart = document.createElement("div");
+      hyphenStart.className = "scroll-item";
+      hyphenStart.textContent = "-";
+      container.appendChild(hyphenStart);
+
+      // Set "0" as an option for surfactant and scent
+      if (isRatio) {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = 0;
+        item.textContent = "0";
+        container.appendChild(item);
+      }
+
       options.forEach((val) => {
         const item = document.createElement("div");
         item.className = "scroll-item";
         item.dataset.value = val;
-        item.textContent = val + (unit || "");
+        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
         container.appendChild(item);
       });
+
+      const hyphenEnd = document.createElement("div");
+      hyphenEnd.className = "scroll-item";
+      hyphenEnd.textContent = "-";
+      container.appendChild(hyphenEnd);
     }
 
     function getCenterValue(container) {
@@ -222,8 +247,8 @@
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
     createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");  // 0.5 step from 0 to 12.5
-    createOptionList(surfactantList, surfOptions, "");
-    createOptionList(scentList, scentOptions, "");
+    createOptionList(surfactantList, [0, ...surfOptions], "", true);
+    createOptionList(scentList, [0, ...scentOptions], "", true);
 
     [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
   </script>
