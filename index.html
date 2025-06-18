@@ -63,22 +63,16 @@
     .scroll-list {
       height: 100px;
       overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
       position: relative;
-      padding-top: 10px;  /* Added padding to ensure top value is visible */
-      padding-bottom: 10px; /* Added padding to ensure bottom value is visible */
-    }
-    .scroll-list::-webkit-scrollbar {
-      display: none;
+      padding: 10px 0;
+      scroll-snap-type: y mandatory;
     }
     .scroll-item {
-      scroll-snap-align: center;
       font-size: 1.2em;
       padding: 0.5em;
       opacity: 0.4;
       transition: opacity 0.2s ease;
+      scroll-snap-align: center;
     }
     .scroll-item.selected {
       font-weight: bold;
