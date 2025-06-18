@@ -1,236 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchCalculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Softwash Calculator</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
+      padding: 1em;
+      background-color: #f4f4f4;
     }
     header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 1em;
-      font-size: 1.5em;
-      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      margin: 0;
     }
     .settings-icon {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      font-size: 1.2em;
+      font-size: 1.5em;
       cursor: pointer;
     }
-    .lock-btn {
-      position: absolute;
-      top: 1em;
-      left: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: white;
-    }
-    .dial-container {
-      display: flex;
-      justify-content: center;
-      gap: 1em;
-      margin: 1em auto;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-    }
-    .dial {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      padding: 0.5em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      width: 80px;
-      position: relative;
-    }
-    .dial label {
-      margin-bottom: 0.5em;
-    }
-    .scroll-list {
-      height: 100px;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      position: relative;
-    }
-    .scroll-list::-webkit-scrollbar {
-      display: none;
-    }
-    .scroll-item {
-      scroll-snap-align: center;
-      font-size: 1.2em;
-      padding: 0.5em;
-      opacity: 0.4;
-      transition: opacity 0.2s ease;
-    }
-    .scroll-item.selected {
-      font-weight: bold;
-      color: #2c3e50;
-      opacity: 1;
-    }
-    .result {
-      margin-top: 1em;
-      font-size: 1.2em;
+    .section {
       background: white;
       padding: 1em;
       border-radius: 10px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      margin: 1em 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .result-table {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      gap: 0.5em 2em;
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.2em;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.75em 1.5em;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
       text-align: left;
+    }
+    th {
+      background-color: #eee;
     }
   </style>
 </head>
 <body>
   <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
-    BatchCalculator
-    <span class="settings-icon" onclick="window.location.href='cost-settings.html'">⚙️</span>
+    <h1>Softwash Calculator</h1>
+    <span class="settings-icon" onclick="window.location.href='settings.html'">&#9881;</span>
   </header>
 
-  <div class="dial-container">
-    <div class="dial">
-      <label>Volume (L)</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
+  <div class="section">
+    <label for="targetSH">Target SH Strength (%)</label>
+    <input type="number" id="targetSH" step="0.1">
+
+    <label for="totalVolume">Total Batch Volume (L)</label>
+    <input type="number" id="totalVolume" step="0.1">
+
+    <label for="surfactantAmount">Surfactant (L)</label>
+    <input type="number" id="surfactantAmount" step="0.1">
+
+    <label for="scentAmount">Scent (L)</label>
+    <input type="number" id="scentAmount" step="0.1">
+
+    <button onclick="calculateMix()">Calculate</button>
   </div>
 
-  <div class="result" id="output">
-    <div class="result-table">
-      <div></div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
+  <div class="section">
+    <h2>Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Amount (L)</th>
+          <th>Cost ($)</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody">
+      </tbody>
+    </table>
   </div>
 
   <script>
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
+    function calculateMix() {
+      const targetSH = parseFloat(document.getElementById('targetSH').value);
+      const totalVolume = parseFloat(document.getElementById('totalVolume').value);
+      const surfactantAmount = parseFloat(document.getElementById('surfactantAmount').value);
+      const scentAmount = parseFloat(document.getElementById('scentAmount').value);
 
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+      const shStrength = parseFloat(localStorage.getItem('shStrength')) || 0;
+      const shDrumSize = parseFloat(localStorage.getItem('shDrumSize')) || 1;
+      const shDrumCost = parseFloat(localStorage.getItem('shDrumCost')) || 1;
+      const surfactantDrumSize = parseFloat(localStorage.getItem('surfactantDrumSize')) || 1;
+      const surfactantDrumCost = parseFloat(localStorage.getItem('surfactantDrumCost')) || 1;
+      const scentDrumSize = parseFloat(localStorage.getItem('scentDrumSize')) || 1;
+      const scentDrumCost = parseFloat(localStorage.getItem('scentDrumCost')) || 1;
 
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
-    }
+      const shAmount = ((targetSH / shStrength) * (totalVolume - surfactantAmount - scentAmount));
+      const waterAmount = totalVolume - shAmount - surfactantAmount - scentAmount;
 
-    function createOptionList(container, options, unit, isRatio = false) {
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
-        container.appendChild(item);
+      const shCost = (shAmount / shDrumSize) * shDrumCost;
+      const surfactantCost = (surfactantAmount / surfactantDrumSize) * surfactantDrumCost;
+      const scentCost = (scentAmount / scentDrumSize) * scentDrumCost;
+
+      const results = [
+        { name: 'SH', amount: shAmount.toFixed(2), cost: shCost.toFixed(2) },
+        { name: 'Surfactant', amount: surfactantAmount.toFixed(2), cost: surfactantCost.toFixed(2) },
+        { name: 'Scent', amount: scentAmount.toFixed(2), cost: scentCost.toFixed(2) },
+        { name: 'Water', amount: waterAmount.toFixed(2), cost: '0.00' }
+      ];
+
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = '';
+      results.forEach(row => {
+        tbody.innerHTML += `<tr><td>${row.name}</td><td>${row.amount}</td><td>${row.cost}</td></tr>`;
       });
     }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      const stockSH = 12.5;
-
-      const shCostPerL = 1.5;
-      const surfCostPerL = 6.0;
-      const scentCostPerL = 8.0;
-
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("output").innerHTML = `
-        <div class="result-table">
-          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-        </div>`;
-    }
-
-    function enableScrollDetection(container) {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
-    }
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(56)].map((_, i) => (0.5 + i * 0.1).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
-
-    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
   </script>
 </body>
 </html>
