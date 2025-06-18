@@ -1,275 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchCalculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2c3e50" />
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
     }
     header {
-      background-color: #2c3e50;
+      background: #2c3e50;
       color: white;
       padding: 1em;
-      font-size: 1.5em;
-      position: relative;
+      text-align: center;
     }
-    .settings-icon {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
+    main {
+      padding: 1em;
+      max-width: 500px;
+      margin: auto;
     }
-    .lock-btn {
-      position: absolute;
-      top: 1em;
-      left: 1em;
-      font-size: 1.2em;
-      cursor: pointer;
-      background: none;
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 1em;
+      margin-top: 2em;
+      background: #2c3e50;
+      color: white;
       border: none;
-      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
     }
-    .dial-container {
-      display: flex;
-      justify-content: center;
-      gap: 1em;
-      margin: 1em auto;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-    }
-    .dial {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      padding: 0.5em;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      width: 80px;
-      position: relative;
-    }
-    .dial label {
-      margin-bottom: 0.5em;
-    }
-    .scroll-list {
-      height: 100px;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      position: relative;
-    }
-    .scroll-list::-webkit-scrollbar {
-      display: none;
-    }
-    .scroll-item {
-      scroll-snap-align: center;
-      font-size: 1.2em;
-      padding: 0.5em;
-      opacity: 0.4;
-      transition: opacity 0.2s ease;
-    }
-    .scroll-item.selected {
-      font-weight: bold;
-      color: #2c3e50;
-      opacity: 1;
-    }
-    .result {
-      position: sticky;
-      bottom: 0;
-      background: white;
-      padding: 1em;
-      font-size: 1.2em;
-      border-radius: 10px 10px 0 0;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-      z-index: 10;
-    }
-    .result-table {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      gap: 0.5em 2em;
-      text-align: left;
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 1em;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <header>
-    <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
-    BatchCalculator
-    <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
+    Settings
   </header>
+  <main>
+    <label>SH Strength (%):
+      <input type="number" step="0.1" id="shStrength">
+    </label>
 
-  <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
-  </div>
+    <label>SH Cost ($):
+      <input type="number" step="0.01" id="shCost">
+    </label>
 
-  <div class="result" id="output">
-    <div class="result-table">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
-  </div>
+    <label>SH Size (L):
+      <input type="number" step="0.1" id="shSize">
+    </label>
+
+    <label>Surfactant Cost ($):
+      <input type="number" step="0.01" id="surfCost">
+    </label>
+
+    <label>Surfactant Size (L):
+      <input type="number" step="0.1" id="surfSize">
+    </label>
+
+    <label>Scent Cost ($):
+      <input type="number" step="0.01" id="scentCost">
+    </label>
+
+    <label>Scent Size (L):
+      <input type="number" step="0.1" id="scentSize">
+    </label>
+
+    <button onclick="saveSettings()">Save Settings</button>
+    <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
+  </main>
 
   <script>
-    let isLocked = false;
-    const lockBtn = document.getElementById("lockBtn");
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
-    }
-
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
-
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
-    }
-
-    function createOptionList(container, options, unit, isRatio = false) {
-      const hyphenStart = document.createElement("div");
-      hyphenStart.className = "scroll-item";
-      hyphenStart.textContent = "-";
-      container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
-      }
-
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
-        container.appendChild(item);
-      });
-
-      const hyphenEnd = document.createElement("div");
-      hyphenEnd.className = "scroll-item";
-      hyphenEnd.textContent = "-";
-      container.appendChild(hyphenEnd);
-    }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
+    function saveSettings() {
+      const settings = {
+        shStrength: document.getElementById("shStrength").value,
+        shCost: document.getElementById("shCost").value,
+        shSize: document.getElementById("shSize").value,
+        surfCost: document.getElementById("surfCost").value,
+        surfSize: document.getElementById("surfSize").value,
+        scentCost: document.getElementById("scentCost").value,
+        scentSize: document.getElementById("scentSize").value
+      };
+      localStorage.setItem("batchSettings", JSON.stringify(settings));
+      alert("Settings saved!");
     }
 
     function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
-      return {
-        stockSH: parseFloat(settings.shStrength) || 12.5,
-        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
-        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
-        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
-      };
+      const saved = JSON.parse(localStorage.getItem("batchSettings"));
+      if (!saved) return;
+      document.getElementById("shStrength").value = saved.shStrength || "";
+      document.getElementById("shCost").value = saved.shCost || "";
+      document.getElementById("shSize").value = saved.shSize || "";
+      document.getElementById("surfCost").value = saved.surfCost || "";
+      document.getElementById("surfSize").value = saved.surfSize || "";
+      document.getElementById("scentCost").value = saved.scentCost || "";
+      document.getElementById("scentSize").value = saved.scentSize || "";
     }
 
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("output").innerHTML = `
-        <div class="result-table">
-          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-        </div>`;
-    }
-
-    function enableScrollDetection(container) {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        if (isLocked) {
-          container.scrollTop = container._lastScrollTop || 0;
-          alert("Dial is locked.");
-          return;
-        }
-        container._lastScrollTop = container.scrollTop;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
-    }
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
-
-    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
+    loadSettings();
   </script>
 </body>
 </html>
