@@ -158,6 +158,15 @@
       hyphenStart.textContent = "-";
       container.appendChild(hyphenStart);
 
+      // Set "0" as an option for surfactant and scent
+      if (isRatio) {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = 0;
+        item.textContent = "0";
+        container.appendChild(item);
+      }
+
       options.forEach((val) => {
         const item = document.createElement("div");
         item.className = "scroll-item";
