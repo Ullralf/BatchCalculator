@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Softwash Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chemical Cost Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 1em;
-      background-color: #f4f4f4;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
     header {
       display: flex;
@@ -23,7 +24,7 @@
       cursor: pointer;
     }
     .section {
-      background: white;
+      background: var(--section-bg);
       padding: 1em;
       border-radius: 10px;
       margin: 1em 0;
@@ -65,7 +66,7 @@
 </head>
 <body>
   <header>
-    <h1>Softwash Calculator</h1>
+    <h1>Chemical Cost Calculator</h1>
     <span class="settings-icon" onclick="window.location.href='settings.html'">&#9881;</span>
   </header>
 
@@ -92,6 +93,7 @@
         <tr>
           <th>Item</th>
           <th>Amount (L)</th>
+          <th>Cost ($)</th>
         </tr>
       </thead>
       <tbody id="resultsBody">
@@ -100,6 +102,21 @@
   </div>
 
   <script>
+    const theme = localStorage.getItem('darkMode') === 'true' ? 'dark' : 'light';
+    applyTheme(theme);
+
+    function applyTheme(mode) {
+      if (mode === 'dark') {
+        document.documentElement.style.setProperty('--bg-color', '#1e1e1e');
+        document.documentElement.style.setProperty('--text-color', '#ffffff');
+        document.documentElement.style.setProperty('--section-bg', '#2a2a2a');
+      } else {
+        document.documentElement.style.setProperty('--bg-color', '#f4f4f4');
+        document.documentElement.style.setProperty('--text-color', '#000000');
+        document.documentElement.style.setProperty('--section-bg', '#ffffff');
+      }
+    }
+
     function calculateMix() {
       const targetSH = parseFloat(document.getElementById('targetSH').value);
       const totalVolume = parseFloat(document.getElementById('totalVolume').value);
@@ -107,21 +124,31 @@
       const scentAmount = parseFloat(document.getElementById('scentAmount').value);
 
       const shStrength = parseFloat(localStorage.getItem('shStrength')) || 0;
+      const shDrumSize = parseFloat(localStorage.getItem('shDrumSize')) || 1;
+      const shDrumCost = parseFloat(localStorage.getItem('shDrumCost')) || 1;
+      const surfactantDrumSize = parseFloat(localStorage.getItem('surfactantDrumSize')) || 1;
+      const surfactantDrumCost = parseFloat(localStorage.getItem('surfactantDrumCost')) || 1;
+      const scentDrumSize = parseFloat(localStorage.getItem('scentDrumSize')) || 1;
+      const scentDrumCost = parseFloat(localStorage.getItem('scentDrumCost')) || 1;
 
       const shAmount = ((targetSH / shStrength) * (totalVolume - surfactantAmount - scentAmount));
       const waterAmount = totalVolume - shAmount - surfactantAmount - scentAmount;
 
+      const shCost = (shAmount / shDrumSize) * shDrumCost;
+      const surfactantCost = (surfactantAmount / surfactantDrumSize) * surfactantDrumCost;
+      const scentCost = (scentAmount / scentDrumSize) * scentDrumCost;
+
       const results = [
-        { name: 'SH', amount: shAmount.toFixed(2) },
-        { name: 'Surfactant', amount: surfactantAmount.toFixed(2) },
-        { name: 'Scent', amount: scentAmount.toFixed(2) },
-        { name: 'Water', amount: waterAmount.toFixed(2) }
+        { name: 'SH', amount: shAmount.toFixed(2), cost: shCost.toFixed(2) },
+        { name: 'Surfactant', amount: surfactantAmount.toFixed(2), cost: surfactantCost.toFixed(2) },
+        { name: 'Scent', amount: scentAmount.toFixed(2), cost: scentCost.toFixed(2) },
+        { name: 'Water', amount: waterAmount.toFixed(2), cost: '0.00' }
       ];
 
       const tbody = document.getElementById('resultsBody');
       tbody.innerHTML = '';
       results.forEach(row => {
-        tbody.innerHTML += `<tr><td>${row.name}</td><td>${row.amount}</td></tr>`;
+        tbody.innerHTML += `<tr><td>${row.name}</td><td>${row.amount}</td><td>${row.cost}</td></tr>`;
       });
     }
   </script>
