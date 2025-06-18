@@ -63,8 +63,14 @@
     .scroll-list {
       height: 100px;
       overflow-y: scroll;
-      position: relative;
-      padding: 10px 0;  /* Adjusted padding to ensure no cut-off at top/bottom */
+      padding: 10px 0;
+      scroll-snap-type: y mandatory;
+      scroll-padding-top: 30px;  /* Added padding to ensure top values are not hidden */
+      scroll-padding-bottom: 30px;  /* Added padding to ensure bottom values are not hidden */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
     .scroll-item {
       font-size: 1.2em;
@@ -197,35 +203,4 @@
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
       const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("output").innerHTML = `
-        <div class="result-table">
-          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-        </div>`;
-    }
-
-    function enableScrollDetection(container) {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
-    }
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(201)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, [0, ...surfOptions], "", true);
-    createOptionList(scentList, [0, ...scentOptions], "", true);
-
-    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
-  </script>
-</body>
-</html>
+      const water = volume - shVol - surfVol
