@@ -103,7 +103,7 @@
 </head>
 <body>
   <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
+    <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
     BatchCalculator
     <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
@@ -137,6 +137,15 @@
   </div>
 
   <script>
+    let isLocked = false;
+    const lockBtn = document.getElementById("lockBtn");
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      lockBtn.textContent = isLocked ? "🔒" : "🔓";
+      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    }
+
     const volumeList = document.getElementById("volumeList");
     const shList = document.getElementById("shList");
     const surfactantList = document.getElementById("surfactantList");
@@ -237,6 +246,12 @@
     function enableScrollDetection(container) {
       let timeout;
       container.addEventListener("scroll", () => {
+        if (isLocked) {
+          container.scrollTop = container._lastScrollTop || 0;
+          alert("Dial is locked.");
+          return;
+        }
+        container._lastScrollTop = container.scrollTop;
         clearTimeout(timeout);
         timeout = setTimeout(() => calculate(), 200);
       });
