@@ -203,4 +203,37 @@
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
       const scentVol = scent * volume;
-      const water = volume - shVol - surfVol
+      const water = volume - shVol - surfVol - scentVol;
+
+      const shCost = shVol * shCostPerL;
+      const surfCost = surfVol * surfCostPerL;
+      const scentCost = scentVol * scentCostPerL;
+
+      document.getElementById("output").innerHTML = `
+        <div class="result-table">
+          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
+          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
+          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
+          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
+        </div>`;
+    }
+
+    function enableScrollDetection(container) {
+      let timeout;
+      container.addEventListener("scroll", () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => calculate(), 200);
+      });
+    }
+
+    // Create option lists
+    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
+    createOptionList(shList, [...Array(201)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(surfactantList, [0, ...surfOptions], "", true);
+    createOptionList(scentList, [0, ...scentOptions], "", true);
+
+    // Enable scroll detection
+    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
+  </script>
+</body>
+</html>
