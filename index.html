@@ -152,7 +152,10 @@
     }
 
     function createOptionList(container, options, unit, isRatio = false) {
-      options.forEach((val) => {
+      // Add hyphen at the beginning and end
+      const optionsWithHyphen = ["-", ...options, "-"];
+
+      optionsWithHyphen.forEach((val) => {
         const item = document.createElement("div");
         item.className = "scroll-item";
         item.dataset.value = val;
