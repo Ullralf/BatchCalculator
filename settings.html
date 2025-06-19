@@ -4,124 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Settings</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+    :root {
+      --primary: #1e293b;
+      --accent: #818cf8;
+      --bg-light: #0f172a;
+      --text-dark: #f1f5f9;
+      --card-bg: #1e293b;
+      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      --radius: 1rem;
+    }
+
+    [data-theme="light"] {
+      --primary: #0f172a;
+      --accent: #4f46e5;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 1em;
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
       text-align: center;
-    }
-    main {
-      padding: 1em;
-      max-width: 500px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 1em;
-    }
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 1em;
-      margin-top: 2em;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .note {
-      font-size: 0.9em;
-      color: #666;
-      margin-top: 1em;
-      text-align: center;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
   </style>
 </head>
 <body>
   <header>
-    Settings
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+    Settings Page
   </header>
-  <main>
-    <label>SH Strength (%):
-      <input type="number" step="0.1" id="shStrength">
-    </label>
-
-    <label>SH Cost ($):
-      <input type="number" step="0.01" id="shCost">
-    </label>
-
-    <label>SH Size (L):
-      <input type="number" step="0.1" id="shSize">
-    </label>
-
-    <label>Surfactant Cost ($):
-      <input type="number" step="0.01" id="surfCost">
-    </label>
-
-    <label>Surfactant Size (L):
-      <input type="number" step="0.1" id="surfSize">
-    </label>
-
-    <label>Scent Cost ($):
-      <input type="number" step="0.01" id="scentCost">
-    </label>
-
-    <label>Scent Size (L):
-      <input type="number" step="0.1" id="scentSize">
-    </label>
-
-    <button onclick="saveSettings()">Save Settings</button>
-    <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
-  </main>
 
   <script>
-    function saveSettings() {
-      const settings = {
-        shStrength: document.getElementById("shStrength").value,
-        shCost: document.getElementById("shCost").value,
-        shSize: document.getElementById("shSize").value,
-        surfCost: document.getElementById("surfCost").value,
-        surfSize: document.getElementById("surfSize").value,
-        scentCost: document.getElementById("scentCost").value,
-        scentSize: document.getElementById("scentSize").value
-      };
-      localStorage.setItem("batchSettings", JSON.stringify(settings));
-      alert("Settings saved!");
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    });
 
-      // Redirect to index.html after saving
-      window.location.href = 'index.html';
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
     }
-
-    function loadSettings() {
-      const saved = JSON.parse(localStorage.getItem("batchSettings"));
-      if (!saved) return;
-      document.getElementById("shStrength").value = saved.shStrength || "";
-      document.getElementById("shCost").value = saved.shCost || "";
-      document.getElementById("shSize").value = saved.shSize || "";
-      document.getElementById("surfCost").value = saved.surfCost || "";
-      document.getElementById("surfSize").value = saved.surfSize || "";
-      document.getElementById("scentCost").value = saved.scentCost || "";
-      document.getElementById("scentSize").value = saved.scentSize || "";
-    }
-
-    loadSettings();
   </script>
 </body>
 </html>
