@@ -1,8 +1,27 @@
-<header>
-  <button class="lock-btn header-icon" id="lockBtn">🔓</button>
-  <button class="dark-toggle">🌓</button>
-  BatchCalculator
-  <span class="recipes-icon header-icon" title="Recipes" onclick="location.href='recipes.html'">🍳</span>
-  <span class="log-icon header-icon" title="Cost Log" onclick="location.href='cost-log.html'">📜</span>
-  <span class="settings-icon header-icon" title="Settings" onclick="location.href='settings.html'">⚙️</span>
-</header>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('header.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header-container").innerHTML = data;
+
+      const lockBtn = document.getElementById("lockBtn");
+      const darkToggle = document.querySelector(".dark-toggle");
+
+      let isLocked = false;
+      lockBtn?.addEventListener("click", () => {
+        isLocked = !isLocked;
+        lockBtn.textContent = isLocked ? "🔒" : "🔓";
+        alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+      });
+
+      darkToggle?.addEventListener("click", () => {
+        const html = document.documentElement;
+        const newTheme = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+      });
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+    });
+});
