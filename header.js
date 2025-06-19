@@ -1,9 +1,8 @@
-// header.js (Optional, if you want to keep your JS separate)
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('header.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('header-container').innerHTML = data;
-    })
-    .catch(error => console.error("Error loading header:", error));
-});
+<header>
+  <button class="lock-btn header-icon" id="lockBtn">🔓</button>
+  <button class="dark-toggle">🌓</button>
+  BatchCalculator
+  <span class="recipes-icon header-icon" title="Recipes" onclick="location.href='recipes.html'">🍳</span>
+  <span class="log-icon header-icon" title="Cost Log" onclick="location.href='cost-log.html'">📜</span>
+  <span class="settings-icon header-icon" title="Settings" onclick="location.href='settings.html'">⚙️</span>
+</header>
