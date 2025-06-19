@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mix Log</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 1em; background: #f9f9f9; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 0.5em; border: 1px solid #ccc; text-align: left; }
+    input, textarea { width: 100%; box-sizing: border-box; }
+    button { margin-top: 1em; padding: 0.5em 1em; }
+  </style>
+</head>
+<body>
+  <h1>Saved Mix Logs</h1>
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Client Name</th>
+        <th>Address</th>
+        <th>Notes</th>
+        <th>GPS</th>
+        <th>SH%</th>
+        <th>Surfactant</th>
+        <th>Scent</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+    const tbody = document.querySelector("#logTable tbody");
+
+    logs.forEach((log, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${log.timestamp}</td>
+        <td><input value="${log.client}" onchange="updateLog(${index}, 'client', this.value)"></td>
+        <td><input value="${log.address}" onchange="updateLog(${index}, 'address', this.value)"></td>
+        <td><textarea onchange="updateLog(${index}, 'notes', this.value)">${log.notes}</textarea></td>
+        <td>${log.gps}</td>
+        <td>${log.sh}%</td>
+        <td>1:${Math.round(1/log.surf)}</td>
+        <td>1:${Math.round(1/log.scent)}</td>
+        <td><button onclick="deleteLog(${index})">🗑️</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    function updateLog(index, field, value) {
+      logs[index][field] = value;
+      localStorage.setItem("mixLogs", JSON.stringify(logs));
+    }
+
+    function deleteLog(index) {
+      if (!confirm("Delete this entry?")) return;
+      logs.splice(index, 1);
+      localStorage.setItem("mixLogs", JSON.stringify(logs));
+      location.reload();
+    }
+  </script>
+</body>
+</html>
