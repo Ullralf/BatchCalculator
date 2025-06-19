@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mix Recipes</title>
+  <link rel="icon" href="icons/icon-192.png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    .container {
+      padding: 1em;
+      max-width: 600px;
+      margin: auto;
+    }
+    .recipe-card {
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      margin-bottom: 1em;
+    }
+    .recipe-card h3 {
+      margin-top: 0;
+    }
+    .btn {
+      background: #2c3e50;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <header>Mix Recipes</header>
+  <div class="container" id="recipeContainer"></div>
+
+  <script>
+    const recipes = [
+      {
+        name: "House Wash",
+        sh: 1.5,
+        surf: 0.02,
+        scent: 0.002,
+        note: "Low strength mix for walls and eaves. Good for painted/rendered surfaces."
+      },
+      {
+        name: "Roof Wash",
+        sh: 4,
+        surf: 0.01,
+        scent: 0.002,
+        note: "Strong mix for roof tile and Colorbond. Avoid run-off."
+      },
+      {
+        name: "Concrete Clean",
+        sh: 3,
+        surf: 0.01,
+        scent: 0,
+        note: "Medium strength for driveways and paths."
+      },
+      {
+        name: "Timber Deck",
+        sh: 0.75,
+        surf: 0.02,
+        scent: 0.001,
+        note: "Gentle mix to avoid damaging timber."
+      },
+      {
+        name: "Pre-Paint Wash",
+        sh: 5,
+        surf: 0.01,
+        scent: 0.002,
+        note: "Very strong for killing mould before repainting."
+      }
+    ];
+
+    const container = document.getElementById("recipeContainer");
+
+    recipes.forEach((r, index) => {
+      const card = document.createElement("div");
+      card.className = "recipe-card";
+      card.innerHTML = `
+        <h3>${r.name}</h3>
+        <p><strong>SH:</strong> ${r.sh}%<br>
+           <strong>Surfactant:</strong> ${r.surf} (${r.surf ? `1:${Math.round(1/r.surf)}` : "none"})<br>
+           <strong>Scent:</strong> ${r.scent || "none"}</p>
+        <p>${r.note}</p>
+        <button class="btn" onclick="applyRecipe(${index})">Use This Mix</button>
+      `;
+      container.appendChild(card);
+    });
+
+    function applyRecipe(index) {
+      const selected = recipes[index];
+      localStorage.setItem("presetMix", JSON.stringify(selected));
+      alert("Mix applied! Returning to main calculator...");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
