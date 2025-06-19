@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Recipes</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#0f172a" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #1e293b;
@@ -38,29 +42,213 @@
       overflow-x: hidden;
       transition: background 0.3s, color 0.3s;
     }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .header-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.85;
+    }
+
+    .header-icon:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .lock-btn {
+      left: 1rem;
+      background: transparent;
+      border: none;
+      color: white;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .recipes-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 1rem;
+      padding: 1rem;
+    }
+
+    .recipe-card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+    }
+
+    .recipe-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .recipe-description {
+      font-size: 1rem;
+      color: var(--text-dark);
+      flex-grow: 1;
+      margin-bottom: 1rem;
+    }
+
+    .recipe-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .recipe-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .recipe-btn:hover {
+      background: #4338ca;
+    }
+
+    .empty-recipes {
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
   </style>
 </head>
 <body>
   <header>
+    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
     <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
-    Recipes Page
+    Recipes
+    <span class="header-icon" title="Batch Calculator" onclick="window.location.href='index.html'">🍳</span>
+    <span class="header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-    });
+  <div class="recipes-container" id="recipesContainer">
+    <!-- Recipes will be dynamically added here -->
+    <div class="empty-recipes" id="emptyMessage">No recipes available. Add your first recipe!</div>
+  </div>
 
+  <script>
     function toggleDarkMode() {
       const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
+
+    let isLocked = false;
+    const lockBtn = document.getElementById("lockBtn");
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      lockBtn.textContent = isLocked ? "🔒" : "🔓";
+      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    }
+
+    // Function to load recipes from localStorage
+    function loadRecipes() {
+      const recipes = JSON.parse(localStorage.getItem("recipes") || "[]");
+      const container = document.getElementById("recipesContainer");
+      const emptyMessage = document.getElementById("emptyMessage");
+
+      // Clear any existing content
+      container.innerHTML = "";
+
+      if (recipes.length === 0) {
+        container.appendChild(emptyMessage);
+      } else {
+        recipes.forEach(recipe => {
+          const recipeCard = document.createElement("div");
+          recipeCard.className = "recipe-card";
+
+          const title = document.createElement("div");
+          title.className = "recipe-title";
+          title.textContent = recipe.name;
+
+          const description = document.createElement("div");
+          description.className = "recipe-description";
+          description.textContent = recipe.description;
+
+          const buttons = document.createElement("div");
+          buttons.className = "recipe-buttons";
+
+          const viewButton = document.createElement("button");
+          viewButton.className = "recipe-btn";
+          viewButton.textContent = "View";
+          viewButton.onclick = () => viewRecipe(recipe.id);
+
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "recipe-btn";
+          deleteButton.textContent = "Delete";
+          deleteButton.onclick = () => deleteRecipe(recipe.id);
+
+          buttons.appendChild(viewButton);
+          buttons.appendChild(deleteButton);
+
+          recipeCard.appendChild(title);
+          recipeCard.appendChild(description);
+          recipeCard.appendChild(buttons);
+
+          container.appendChild(recipeCard);
+        });
+      }
+    }
+
+    // Function to view a recipe
+    function viewRecipe(id) {
+      const recipes = JSON.parse(localStorage.getItem("recipes") || "[]");
+      const recipe = recipes.find(r => r.id === id);
+      if (recipe) {
+        alert(`Name: ${recipe.name}\nDescription: ${recipe.description}\nIngredients: ${recipe.ingredients.join(', ')}`);
+      }
+    }
+
+    // Function to delete a recipe
+    function deleteRecipe(id) {
+      let recipes = JSON.parse(localStorage.getItem("recipes") || "[]");
+      recipes = recipes.filter(r => r.id !== id);
+      localStorage.setItem("recipes", JSON.stringify(recipes));
+      loadRecipes();
+    }
+
+    // Load recipes on page load
+    window.onload = loadRecipes;
   </script>
 </body>
 </html>
