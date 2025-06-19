@@ -7,85 +7,16 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2c3e50" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #1e293b;
-      --accent: #818cf8;
-      --bg-light: #0f172a;
-      --text-dark: #f1f5f9;
-      --card-bg: #1e293b;
-      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-      --radius: 1rem;
-    }
-
-    [data-theme="light"] {
-      --primary: #0f172a;
-      --accent: #4f46e5;
-      --bg-light: #f8fafc;
-      --text-dark: #1e293b;
-      --card-bg: #ffffff;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
+    /* Your CSS here */
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg-light);
       color: var(--text-dark);
       margin: 0;
       padding: 0;
     }
-
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 1rem;
-      font-size: 1.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: var(--shadow);
-    }
-
-    .header-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: 0.2s ease;
-      opacity: 0.85;
-    }
-
-    .header-icon:hover {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    /* Positioning for the lock and dark mode buttons */
-    .lock-btn {
-      left: 1rem;
-      background: transparent;
-      border: none;
-      color: white;
-    }
-
-    .dark-toggle {
-      left: 3.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.3rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    /* Icon buttons for recipes, log, settings (on the right) */
-    .settings-icon { right: 1rem; }
-    .log-icon { right: 3.5rem; }
-    .recipes-icon { right: 6rem; }
 
     main {
       padding: 1em;
@@ -102,10 +33,6 @@
       width: 100%;
       padding: 0.5em;
       margin-top: 0.5em;
-      background: var(--card-bg);
-      color: var(--text-dark);
-      border-radius: var(--radius);
-      border: 1px solid #ccc;
     }
 
     button {
@@ -127,17 +54,29 @@
       margin-top: 1em;
       text-align: center;
     }
+
+    .dark-toggle, .lock-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .lock-btn {
+      left: 1rem;
+    }
+
+    .dark-toggle {
+      left: 3.5rem;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
-    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
-    Settings
-    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
-    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
-    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
-  </header>
+  <div id="header-container"></div> <!-- Placeholder for header -->
 
   <main>
     <label>SH Strength (%):
@@ -172,52 +111,20 @@
     <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
   </main>
 
+  <!-- Add your JavaScript here -->
+  <script src="header.js"></script> <!-- Include the JavaScript file for loading header -->
+
+  <script>
+    fetch('header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header-container').innerHTML = data;
+      })
+      .catch(error => console.error("Error loading header:", error));
+  </script>
+
   <script>
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
-        shCost: document.getElementById("shCost").value,
-        shSize: document.getElementById("shSize").value,
-        surfCost: document.getElementById("surfCost").value,
-        surfSize: document.getElementById("surfSize").value,
-        scentCost: document.getElementById("scentCost").value,
-        scentSize: document.getElementById("scentSize").value
-      };
-      localStorage.setItem("batchSettings", JSON.stringify(settings));
-      alert("Settings saved!");
-
-      // Redirect to index.html after saving
-      window.location.href = 'index.html';
-    }
-
-    function loadSettings() {
-      const saved = JSON.parse(localStorage.getItem("batchSettings"));
-      if (!saved) return;
-      document.getElementById("shStrength").value = saved.shStrength || "";
-      document.getElementById("shCost").value = saved.shCost || "";
-      document.getElementById("shSize").value = saved.shSize || "";
-      document.getElementById("surfCost").value = saved.surfCost || "";
-      document.getElementById("surfSize").value = saved.surfSize || "";
-      document.getElementById("scentCost").value = saved.scentCost || "";
-      document.getElementById("scentSize").value = saved.scentSize || "";
-    }
-
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
-    }
-
-    // On page load, check for the theme preference in localStorage
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-      loadSettings();
-    });
-  </script>
-</body>
-</html>
+        shCost: document.getElementByI
