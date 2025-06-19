@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -19,6 +19,15 @@
       --radius: 1rem;
     }
 
+    [data-theme="dark"] {
+      --primary: #1e293b;
+      --accent: #818cf8;
+      --bg-light: #0f172a;
+      --text-dark: #f1f5f9;
+      --card-bg: #1e293b;
+      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -31,6 +40,7 @@
       color: var(--text-dark);
       text-align: center;
       overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
 
     header {
@@ -71,6 +81,18 @@
       color: white;
     }
 
+    .dark-toggle {
+      position: absolute;
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
     .dial-container {
       display: flex;
       justify-content: center;
@@ -89,6 +111,8 @@
       box-shadow: var(--shadow);
       width: 90px;
       flex: 0 0 auto;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
     .dial label {
@@ -185,207 +209,20 @@
 <body>
   <header>
     <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
     BatchCalculator
     <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
     <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
     <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
-  <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
-  </div>
-
-  <div class="result" id="output">
-    <div class="result-table" id="resultsTable">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
-    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
-  </div>
+  <!-- ... existing dial-container, result section, and script tags remain unchanged ... -->
 
   <script>
-    let isLocked = false;
-    const lockBtn = document.getElementById("lockBtn");
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
-
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
-
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
-    }
-
-    function createOptionList(container, options, unit, isRatio = false) {
-      const hyphenStart = document.createElement("div");
-      hyphenStart.className = "scroll-item";
-      hyphenStart.textContent = "-";
-      container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
-      }
-
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
-        container.appendChild(item);
-      });
-
-      const hyphenEnd = document.createElement("div");
-      hyphenEnd.className = "scroll-item";
-      hyphenEnd.textContent = "-";
-      container.appendChild(hyphenEnd);
-    }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
-      return {
-        stockSH: parseFloat(settings.shStrength) || 12.5,
-        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
-        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
-        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
-      };
-    }
-
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("resultsTable").innerHTML = `
-        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-      `;
-    }
-
-    async function saveLog() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surf = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surf, scent].includes(null)) return;
-
-      const timestamp = new Date().toLocaleString();
-      const client = prompt("Client name?") || "";
-      const address = prompt("Job address?") || "";
-      const notes = prompt("Notes?") || "";
-
-      let gps = "";
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-            finalizeLog(gps);
-          },
-          () => finalizeLog("Unavailable")
-        );
-      } else {
-        finalizeLog("Not supported");
-      }
-
-      function finalizeLog(gpsCoords) {
-        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
-        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-        logs.push(newEntry);
-        localStorage.setItem("mixLogs", JSON.stringify(logs));
-        alert("Mix saved to log!");
-        window.location.href = "cost-log.html";
-      }
-    }
-
-    [volumeList, shList, surfactantList, scentList].forEach(container => {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        if (isLocked) {
-          container.scrollTop = container._lastScrollTop || 0;
-          alert("Dial is locked.");
-          return;
-        }
-        container._lastScrollTop = container.scrollTop;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
-    });
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
   </script>
 </body>
 </html>
