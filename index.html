@@ -57,9 +57,6 @@
       width: 80px;
       position: relative;
     }
-    .dial label {
-      margin-bottom: 0.5em;
-    }
     .scroll-list {
       height: 100px;
       overflow-y: scroll;
@@ -99,16 +96,15 @@
       gap: 0.5em 2em;
       text-align: left;
     }
-    .recipe-btn {
-      position: absolute;
-      bottom: 1em;
-      right: 1em;
+    #saveLogBtn {
+      margin-top: 1em;
       background: #2c3e50;
       color: white;
-      padding: 0.5em 1em;
-      border-radius: 5px;
-      text-decoration: none;
+      border: none;
+      padding: 0.7em 1em;
       font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -139,15 +135,14 @@
   </div>
 
   <div class="result" id="output">
-    <div class="result-table">
+    <div class="result-table" id="resultsTable">
       <div>Cost</div><div>Water</div><div>0.00L</div>
       <div>$0.00</div><div>SH</div><div>0.00L</div>
       <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
       <div>$0.00</div><div>Scent</div><div>0.00L</div>
     </div>
+    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
   </div>
-
-  <a class="recipe-btn" href="recipes.html">📘 Recipes</a>
 
   <script>
     let isLocked = false;
@@ -254,16 +249,50 @@
       const surfCost = surfVol * surfCostPerL;
       const scentCost = scentVol * scentCostPerL;
 
-      document.getElementById("output").innerHTML = `
-        <div class="result-table">
-          <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-          <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-          <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-          <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-        </div>`;
+      document.getElementById("resultsTable").innerHTML = `
+        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
+        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
+        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
+        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
+      `;
     }
 
-    function enableScrollDetection(container) {
+    async function saveLog() {
+      const volume = getCenterValue(volumeList);
+      const sh = getCenterValue(shList);
+      const surf = getCenterValue(surfactantList);
+      const scent = getCenterValue(scentList);
+      if ([volume, sh, surf, scent].includes(null)) return;
+
+      const timestamp = new Date().toLocaleString();
+      const client = prompt("Client name?") || "";
+      const address = prompt("Job address?") || "";
+      const notes = prompt("Notes?") || "";
+
+      let gps = "";
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+            finalizeLog(gps);
+          },
+          () => finalizeLog("Unavailable")
+        );
+      } else {
+        finalizeLog("Not supported");
+      }
+
+      function finalizeLog(gpsCoords) {
+        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
+        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+        logs.push(newEntry);
+        localStorage.setItem("mixLogs", JSON.stringify(logs));
+        alert("Mix saved to log!");
+        window.location.href = "cost-log.html";
+      }
+    }
+
+    [volumeList, shList, surfactantList, scentList].forEach(container => {
       let timeout;
       container.addEventListener("scroll", () => {
         if (isLocked) {
@@ -275,34 +304,12 @@
         clearTimeout(timeout);
         timeout = setTimeout(() => calculate(), 200);
       });
-    }
-
-    function scrollToValue(container, value, unit = '', isRatio = false) {
-      const items = container.querySelectorAll(".scroll-item");
-      for (let item of items) {
-        if (parseFloat(item.dataset.value) === value) {
-          container.scrollTop = item.offsetTop - container.clientHeight / 2 + item.clientHeight / 2;
-          break;
-        }
-      }
-    }
+    });
 
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
     createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
     createOptionList(surfactantList, surfOptions, "", true);
     createOptionList(scentList, scentOptions, "", true);
-
-    [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
-
-    // Apply preset mix from recipes.html if present
-    const preset = JSON.parse(localStorage.getItem("presetMix"));
-    if (preset) {
-      scrollToValue(shList, preset.sh, '%');
-      scrollToValue(surfactantList, preset.surf, '', true);
-      scrollToValue(scentList, preset.scent, '', true);
-      localStorage.removeItem("presetMix");
-      setTimeout(() => calculate(), 300);
-    }
   </script>
 </body>
 </html>
