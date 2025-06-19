@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#2c3e50" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Your CSS here */
+    /* General Page Styling */
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-light);
@@ -19,9 +19,59 @@
     }
 
     main {
-      padding: 1em;
+      padding: 2rem;
       max-width: 500px;
       margin: auto;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .header-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.85;
+    }
+
+    .header-icon:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .settings-icon { right: 1rem; }
+    .log-icon { right: 3.5rem; }
+    .recipes-icon { right: 6rem; }
+    .lock-btn {
+      left: 1rem;
+      background: transparent;
+      border: none;
+      color: white;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
 
     label {
@@ -33,6 +83,7 @@
       width: 100%;
       padding: 0.5em;
       margin-top: 0.5em;
+      border-radius: 5px;
     }
 
     button {
@@ -55,27 +106,18 @@
       text-align: center;
     }
 
-    .dark-toggle, .lock-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.3rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
+    /* Additional Styles for Input Elements */
+    .input-container {
+      margin-bottom: 1.5rem;
     }
 
-    .lock-btn {
-      left: 1rem;
-    }
-
-    .dark-toggle {
-      left: 3.5rem;
+    .input-container input {
+      width: 100%;
     }
   </style>
 </head>
 <body>
+  <!-- Load shared header -->
   <div id="header-container"></div> <!-- Placeholder for header -->
 
   <main>
@@ -111,8 +153,8 @@
     <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
   </main>
 
-  <!-- Add your JavaScript here -->
-  <script src="header.js"></script> <!-- Include the JavaScript file for loading header -->
+  <!-- Add JavaScript for dynamic header -->
+  <script src="header.js"></script> <!-- JavaScript file for loading header -->
 
   <script>
     fetch('header.html')
@@ -127,4 +169,33 @@
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
-        shCost: document.getElementByI
+        shCost: document.getElementById("shCost").value,
+        shSize: document.getElementById("shSize").value,
+        surfCost: document.getElementById("surfCost").value,
+        surfSize: document.getElementById("surfSize").value,
+        scentCost: document.getElementById("scentCost").value,
+        scentSize: document.getElementById("scentSize").value
+      };
+      localStorage.setItem("batchSettings", JSON.stringify(settings));
+      alert("Settings saved!");
+
+      // Redirect to index.html after saving
+      window.location.href = 'index.html';
+    }
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem("batchSettings"));
+      if (!saved) return;
+      document.getElementById("shStrength").value = saved.shStrength || "";
+      document.getElementById("shCost").value = saved.shCost || "";
+      document.getElementById("shSize").value = saved.shSize || "";
+      document.getElementById("surfCost").value = saved.surfCost || "";
+      document.getElementById("surfSize").value = saved.surfSize || "";
+      document.getElementById("scentCost").value = saved.scentCost || "";
+      document.getElementById("scentSize").value = saved.scentSize || "";
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>
