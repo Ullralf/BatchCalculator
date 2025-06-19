@@ -71,6 +71,9 @@
       transform: translateY(-50%) scale(1.1);
     }
 
+    .settings-icon { right: 1rem; }
+    .log-icon { right: 3.5rem; }
+    .recipes-icon { right: 6rem; }
     .lock-btn {
       left: 1rem;
       background: transparent;
@@ -208,28 +211,13 @@
     <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
     <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
     BatchCalculator
-    <span class="header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
-    <span class="header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
-    <span class="header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
+    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
+    <!-- Add your dials here -->
   </div>
 
   <div class="result" id="output">
@@ -245,174 +233,19 @@
   <script>
     function toggleDarkMode() {
       const html = document.documentElement;
-      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
     }
 
-    let isLocked = false;
-    const lockBtn = document.getElementById("lockBtn");
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
-    }
-
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
-
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
-    }
-
-    function createOptionList(container, options, unit, isRatio = false) {
-      const hyphenStart = document.createElement("div");
-      hyphenStart.className = "scroll-item";
-      hyphenStart.textContent = "-";
-      container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
+    // On page load, check for the theme preference in localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
       }
-
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
-        container.appendChild(item);
-      });
-
-      const hyphenEnd = document.createElement("div");
-      hyphenEnd.className = "scroll-item";
-      hyphenEnd.textContent = "-";
-      container.appendChild(hyphenEnd);
-    }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
-      return {
-        stockSH: parseFloat(settings.shStrength) || 12.5,
-        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
-        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
-        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
-      };
-    }
-
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("resultsTable").innerHTML = `
-        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-      `;
-    }
-
-    async function saveLog() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surf = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surf, scent].includes(null)) return;
-
-      const timestamp = new Date().toLocaleString();
-      const client = prompt("Client name?") || "";
-      const address = prompt("Job address?") || "";
-      const notes = prompt("Notes?") || "";
-
-      let gps = "";
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-            finalizeLog(gps);
-          },
-          () => finalizeLog("Unavailable")
-        );
-      } else {
-        finalizeLog("Not supported");
-      }
-
-      function finalizeLog(gpsCoords) {
-        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
-        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-        logs.push(newEntry);
-        localStorage.setItem("mixLogs", JSON.stringify(logs));
-        alert("Mix saved to log!");
-        window.location.href = "cost-log.html";
-      }
-    }
-
-    [volumeList, shList, surfactantList, scentList].forEach(container => {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        if (isLocked) {
-          container.scrollTop = container._lastScrollTop || 0;
-          alert("Dial is locked.");
-          return;
-        }
-        container._lastScrollTop = container.scrollTop;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
     });
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
   </script>
 </body>
 </html>
