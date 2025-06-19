@@ -28,9 +28,18 @@
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       margin-bottom: 1em;
+      position: relative;
     }
     .recipe-card h3 {
       margin-top: 0;
+      margin-bottom: 0.5em;
+    }
+    .recipe-card img {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      width: 40px;
+      height: 40px;
     }
     .btn {
       background: #2c3e50;
@@ -58,36 +67,50 @@
       color: white;
       border: none;
     }
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      padding: 1em;
+    }
   </style>
 </head>
 <body>
   <header>Mix Recipes</header>
   <div class="container" id="recipeContainer"></div>
+  <div class="footer-buttons">
+    <button class="btn" onclick="createCustomRecipe()">➕ Custom Recipe</button>
+    <button class="btn" onclick="window.location.href='index.html'">⬅ Return</button>
+  </div>
 
   <script>
     const recipes = [
       {
         name: "Terracotta Roof",
+        icon: "icons/terracotta.png",
         safe: { sh: 3, surf: 0.005, scent: 0, note: "Maintenance wash for tile roofs." },
         heavy: { sh: 5.5, surf: 0.005, scent: 0.002, note: "For thick lichen or mould." }
       },
       {
         name: "Colorbond Roof",
+        icon: "icons/colorbond.png",
         safe: { sh: 2, surf: 0.01, scent: 0, note: "Routine wash on painted metal." },
         heavy: { sh: 4.5, surf: 0.005, scent: 0.002, note: "Mossy or grime-heavy roofs." }
       },
       {
         name: "Concrete / Driveway",
+        icon: "icons/concrete.png",
         safe: { sh: 2.5, surf: 0.01, scent: 0, note: "General surface cleaning." },
         heavy: { sh: 4.5, surf: 0.01, scent: 0, note: "Lichen, stains or moss removal." }
       },
       {
         name: "Painted Wall",
+        icon: "icons/painted.png",
         safe: { sh: 1.5, surf: 0.015, scent: 0.001, note: "Annual house wash." },
         heavy: { sh: 3, surf: 0.01, scent: 0.002, note: "Heavy grime, oxidation or mildew." }
       },
       {
         name: "Timber Deck",
+        icon: "icons/timber.png",
         safe: { sh: 0.75, surf: 0.02, scent: 0.001, note: "Gentle clean to protect wood." },
         heavy: { sh: 1.5, surf: 0.015, scent: 0.002, note: "For blackened timber or grime." }
       }
@@ -100,6 +123,7 @@
       card.className = "recipe-card";
 
       card.innerHTML = `
+        <img src="${r.icon}" alt="icon">
         <h3>${r.name}</h3>
         <div class="toggle-btns">
           <button onclick="toggleMode(${index}, 'safe')" id="safe-${index}" class="active">Safe</button>
@@ -135,6 +159,17 @@
       const selected = isHeavy ? recipes[index].heavy : recipes[index].safe;
       localStorage.setItem("presetMix", JSON.stringify(selected));
       alert("Mix applied! Returning to main calculator...");
+      window.location.href = "index.html";
+    }
+
+    function createCustomRecipe() {
+      const custom = prompt("Enter SH%, Surfactant, Scent (comma-separated):", "2.5,0.01,0.001");
+      if (!custom) return;
+      const parts = custom.split(',').map(x => parseFloat(x));
+      if (parts.length !== 3 || parts.some(isNaN)) return alert("Invalid input.");
+      const [sh, surf, scent] = parts;
+      localStorage.setItem("presetMix", JSON.stringify({ sh, surf, scent }));
+      alert("Custom mix applied! Returning to main calculator...");
       window.location.href = "index.html";
     }
   </script>
