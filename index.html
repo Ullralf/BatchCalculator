@@ -217,7 +217,22 @@
   </header>
 
   <div class="dial-container">
-    <!-- Add your dials here -->
+    <div class="dial">
+      <label>Vol.</label>
+      <div class="scroll-list" id="volumeList"></div>
+    </div>
+    <div class="dial">
+      <label>SH %</label>
+      <div class="scroll-list" id="shList"></div>
+    </div>
+    <div class="dial">
+      <label>Surfactant</label>
+      <div class="scroll-list" id="surfactantList"></div>
+    </div>
+    <div class="dial">
+      <label>Scent</label>
+      <div class="scroll-list" id="scentList"></div>
+    </div>
   </div>
 
   <div class="result" id="output">
@@ -246,6 +261,52 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
       }
     });
+
+    const volumeList = document.getElementById("volumeList");
+    const shList = document.getElementById("shList");
+    const surfactantList = document.getElementById("surfactantList");
+    const scentList = document.getElementById("scentList");
+
+    function createOptionList(container, options, unit) {
+      options.forEach((val) => {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = val;
+        item.textContent = val + (unit || "");
+        container.appendChild(item);
+      });
+    }
+
+    function getCenterValue(container) {
+      const containerRect = container.getBoundingClientRect();
+      const centerY = containerRect.top + container.clientHeight / 2;
+      const items = container.querySelectorAll(".scroll-item");
+      let closest = null;
+      let minDist = Infinity;
+
+      items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(centerY - itemCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = item;
+        }
+        item.classList.remove("selected");
+      });
+
+      if (closest) {
+        closest.classList.add("selected");
+        return parseFloat(closest.dataset.value);
+      }
+      return null;
+    }
+
+    // Example dials values
+    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(surfactantList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
+    createOptionList(scentList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
   </script>
 </body>
 </html>
