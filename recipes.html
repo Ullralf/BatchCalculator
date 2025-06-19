@@ -3,211 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mix Recipes</title>
-  <link rel="icon" href="icons/icon-192.png" />
+  <title>Recipes</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+    :root {
+      --primary: #1e293b;
+      --accent: #818cf8;
+      --bg-light: #0f172a;
+      --text-dark: #f1f5f9;
+      --card-bg: #1e293b;
+      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      --radius: 1rem;
+    }
+
+    [data-theme="light"] {
+      --primary: #0f172a;
+      --accent: #4f46e5;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
     }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 1em;
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
       text-align: center;
-    }
-    .container {
-      padding: 1em;
-      max-width: 700px;
-      margin: auto;
-    }
-    .recipe-card {
-      background: white;
-      padding: 1em;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      margin-bottom: 1em;
-      position: relative;
-    }
-    .recipe-card h3 {
-      margin-top: 0;
-      margin-bottom: 0.5em;
-    }
-    .recipe-card img {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      width: 40px;
-      height: 40px;
-    }
-    .btn {
-      background: #2c3e50;
-      color: white;
-      border: none;
-      padding: 0.5em 1em;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 0.5em;
-    }
-    .toggle-btns {
-      display: flex;
-      gap: 0.5em;
-      margin-top: 0.5em;
-    }
-    .toggle-btns button {
-      flex: 1;
-      padding: 0.5em;
-      cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .active {
-      background: #2c3e50;
-      color: white;
-      border: none;
-    }
-    .footer-buttons {
-      display: flex;
-      justify-content: space-between;
-      padding: 1em;
-    }
-    .editable-note {
-      width: 100%;
-      margin-top: 0.5em;
-      padding: 0.5em;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
   </style>
 </head>
 <body>
-  <header>Mix Recipes</header>
-  <div class="container" id="recipeContainer"></div>
-  <div class="footer-buttons">
-    <button class="btn" onclick="createCustomRecipe()">➕ Custom Recipe</button>
-    <button class="btn" onclick="window.location.href='index.html'">⬅ Return</button>
-  </div>
+  <header>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+    Recipes Page
+  </header>
 
   <script>
-    const STORAGE_KEY = "customNotes";
-    let customNotes = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-
-    const recipes = [
-      {
-        name: "Terracotta Roof",
-        icon: "icons/terracotta.png",
-        safe: { sh: 3, surf: 0.005, scent: 0, note: "Maintenance wash for tile roofs." },
-        heavy: { sh: 5.5, surf: 0.005, scent: 0.002, note: "For thick lichen or mould." }
-      },
-      {
-        name: "Colorbond Roof",
-        icon: "icons/colorbond.png",
-        safe: { sh: 2, surf: 0.01, scent: 0, note: "Routine wash on painted metal." },
-        heavy: { sh: 4.5, surf: 0.005, scent: 0.002, note: "Mossy or grime-heavy roofs." }
-      },
-      {
-        name: "Concrete / Driveway",
-        icon: "icons/concrete.png",
-        safe: { sh: 2.5, surf: 0.01, scent: 0, note: "General surface cleaning." },
-        heavy: { sh: 4.5, surf: 0.01, scent: 0, note: "Lichen, stains or moss removal." }
-      },
-      {
-        name: "Painted Wall",
-        icon: "icons/painted.png",
-        safe: { sh: 1.5, surf: 0.015, scent: 0.001, note: "Annual house wash." },
-        heavy: { sh: 3, surf: 0.01, scent: 0.002, note: "Heavy grime, oxidation or mildew." }
-      },
-      {
-        name: "Timber Deck",
-        icon: "icons/timber.png",
-        safe: { sh: 0.75, surf: 0.02, scent: 0.001, note: "Gentle clean to protect wood." },
-        heavy: { sh: 1.5, surf: 0.015, scent: 0.002, note: "For blackened timber or grime." }
-      },
-      {
-        name: "Freshly Painted Surface",
-        icon: "icons/freshpaint.png",
-        safe: {
-          sh: 0,
-          surf: 0.015,
-          scent: 0.001,
-          note: "Avoid SH where possible. Gentle surfactant rinse only. Do not allow to dwell."
-        },
-        heavy: {
-          sh: 0.5,
-          surf: 0.015,
-          scent: 0.002,
-          note: "SH must be used with extreme caution. Rinse quickly. Always test a small area first."
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
       }
-    ];
-
-    const container = document.getElementById("recipeContainer");
-
-    recipes.forEach((r, index) => {
-      const card = document.createElement("div");
-      card.className = "recipe-card";
-
-      card.innerHTML = `
-        <img src="${r.icon}" alt="icon">
-        <h3>${r.name}</h3>
-        <div class="toggle-btns">
-          <button onclick="toggleMode(${index}, 'safe')" id="safe-${index}" class="active">Safe</button>
-          <button onclick="toggleMode(${index}, 'heavy')" id="heavy-${index}">Heavy</button>
-        </div>
-        <div id="details-${index}"></div>
-        <textarea class="editable-note" id="note-${index}" oninput="saveNote(${index})" placeholder="Add your own tips or reminders here..."></textarea>
-        <button class="btn" onclick="applyRecipe(${index})">Use This Mix</button>
-      `;
-
-      container.appendChild(card);
-      updateDetails(index, 'safe');
     });
 
-    function toggleMode(index, mode) {
-      document.getElementById(`safe-${index}`).classList.remove('active');
-      document.getElementById(`heavy-${index}`).classList.remove('active');
-      document.getElementById(`${mode}-${index}`).classList.add('active');
-      updateDetails(index, mode);
-    }
-
-    function updateDetails(index, mode) {
-      const recipe = recipes[index][mode];
-      const key = `${index}-${mode}`;
-      document.getElementById(`details-${index}`).innerHTML = `
-        <p><strong>SH:</strong> ${recipe.sh}%<br>
-        <strong>Surfactant:</strong> ${recipe.surf ? `1:${Math.round(1/recipe.surf)}` : "none"}<br>
-        <strong>Scent:</strong> ${recipe.scent ? `1:${Math.round(1/recipe.scent)}` : "none"}</p>
-      `;
-      document.getElementById(`note-${index}`).value = customNotes[key] || recipe.note;
-    }
-
-    function saveNote(index) {
-      const isHeavy = document.getElementById(`heavy-${index}`).classList.contains('active');
-      const mode = isHeavy ? 'heavy' : 'safe';
-      const key = `${index}-${mode}`;
-      const value = document.getElementById(`note-${index}`).value;
-      customNotes[key] = value;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(customNotes));
-    }
-
-    function applyRecipe(index) {
-      const isHeavy = document.getElementById(`heavy-${index}`).classList.contains('active');
-      const selected = recipes[index][isHeavy ? 'heavy' : 'safe'];
-      localStorage.setItem("presetMix", JSON.stringify(selected));
-      alert("Mix applied! Returning to main calculator...");
-      window.location.href = "index.html";
-    }
-
-    function createCustomRecipe() {
-      const custom = prompt("Enter SH%, Surfactant, Scent (comma-separated):", "2.5,0.01,0.001");
-      if (!custom) return;
-      const parts = custom.split(',').map(x => parseFloat(x));
-      if (parts.length !== 3 || parts.some(isNaN)) return alert("Invalid input.");
-      const [sh, surf, scent] = parts;
-      localStorage.setItem("presetMix", JSON.stringify({ sh, surf, scent }));
-      alert("Custom mix applied! Returning to main calculator...");
-      window.location.href = "index.html";
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
     }
   </script>
 </body>
