@@ -6,9 +6,10 @@
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#2c3e50" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* Your CSS here */
     :root {
       --primary: #1e293b;
       --accent: #818cf8;
@@ -207,32 +208,10 @@
   </style>
 </head>
 <body>
-  <header>
-    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
-    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
-    BatchCalculator
-    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
-    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
-    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
-  </header>
+  <div id="header-container"></div> <!-- Placeholder for header -->
 
   <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
+    <!-- Your dials here -->
   </div>
 
   <div class="result" id="output">
@@ -245,6 +224,18 @@
     <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
   </div>
 
+  <!-- Add your JavaScript here -->
+  <script src="header.js"></script> <!-- Include the JavaScript file for loading header -->
+
+  <script>
+    fetch('header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header-container').innerHTML = data;
+      })
+      .catch(error => console.error("Error loading header:", error));
+  </script>
+
   <script>
     function toggleDarkMode() {
       const html = document.documentElement;
@@ -254,59 +245,12 @@
       localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
     }
 
-    // On page load, check for the theme preference in localStorage
     document.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
       }
     });
-
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
-
-    function createOptionList(container, options, unit) {
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = val + (unit || "");
-        container.appendChild(item);
-      });
-    }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    // Example dials values
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
-    createOptionList(scentList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
   </script>
 </body>
 </html>
