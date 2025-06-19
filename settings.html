@@ -38,8 +38,51 @@
     header {
       background: var(--primary);
       color: white;
-      padding: 1em;
-      text-align: center;
+      padding: 1rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .header-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.85;
+    }
+
+    .header-icon:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .settings-icon { right: 1rem; }
+    .log-icon { right: 3.5rem; }
+    .recipes-icon { right: 6rem; }
+    .lock-btn {
+      left: 1rem;
+      background: transparent;
+      border: none;
+      color: white;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
 
     main {
@@ -82,24 +125,18 @@
       margin-top: 1em;
       text-align: center;
     }
-
-    .dark-toggle {
-      position: absolute;
-      top: 1em;
-      left: 1em;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
   <header>
-    Settings
+    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
     <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+    Settings
+    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
+
   <main>
     <label>SH Strength (%):
       <input type="number" step="0.1" id="shStrength">
