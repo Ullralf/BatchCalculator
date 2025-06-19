@@ -6,119 +6,13 @@
   <title>Settings</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
+  <meta name="theme-color" content="#0f172a" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    /* General Page Styling */
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      margin: 0;
-      padding: 0;
-    }
-
-    main {
-      padding: 2rem;
-      max-width: 500px;
-      margin: auto;
-    }
-
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 1rem;
-      font-size: 1.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: var(--shadow);
-    }
-
-    .header-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: 0.2s ease;
-      opacity: 0.85;
-    }
-
-    .header-icon:hover {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .settings-icon { right: 1rem; }
-    .log-icon { right: 3.5rem; }
-    .recipes-icon { right: 6rem; }
-    .lock-btn {
-      left: 1rem;
-      background: transparent;
-      border: none;
-      color: white;
-    }
-
-    .dark-toggle {
-      position: absolute;
-      left: 3.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.3rem;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    label {
-      display: block;
-      margin-top: 1em;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-      border-radius: 5px;
-    }
-
-    button {
-      display: block;
-      width: 100%;
-      padding: 1em;
-      margin-top: 2em;
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .note {
-      font-size: 0.9em;
-      color: #666;
-      margin-top: 1em;
-      text-align: center;
-    }
-
-    /* Additional Styles for Input Elements */
-    .input-container {
-      margin-bottom: 1.5rem;
-    }
-
-    .input-container input {
-      width: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Load shared header -->
-  <div id="header-container"></div> <!-- Placeholder for header -->
+  <div id="header-container"></div>
 
   <main>
     <label>SH Strength (%):
@@ -153,9 +47,7 @@
     <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
   </main>
 
-  <!-- Add JavaScript for dynamic header -->
-  <script src="header.js"></script> <!-- JavaScript file for loading header -->
-
+  <script src="header.js"></script>
   <script>
     fetch('header.html')
       .then(response => response.text())
@@ -163,9 +55,7 @@
         document.getElementById('header-container').innerHTML = data;
       })
       .catch(error => console.error("Error loading header:", error));
-  </script>
 
-  <script>
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
@@ -178,8 +68,6 @@
       };
       localStorage.setItem("batchSettings", JSON.stringify(settings));
       alert("Settings saved!");
-
-      // Redirect to index.html after saving
       window.location.href = 'index.html';
     }
 
