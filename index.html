@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -84,15 +84,14 @@
       opacity: 1;
     }
     .result {
-      margin-top: 1em;
-      font-size: 1.2em;
+      position: sticky;
+      bottom: 0;
       background: white;
       padding: 1em;
-      border-radius: 10px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-size: 1.2em;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      z-index: 10;
     }
     .result-table {
       display: grid;
@@ -100,18 +99,29 @@
       gap: 0.5em 2em;
       text-align: left;
     }
+    .recipe-btn {
+      position: absolute;
+      bottom: 1em;
+      right: 1em;
+      background: #2c3e50;
+      color: white;
+      padding: 0.5em 1em;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
   <header>
-    <button class="lock-btn" onclick="toggleLock()">🔓</button>
+    <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
     BatchCalculator
-    <span class="settings-icon" onclick="window.location.href='cost-settings.html'">⚙️</span>
+    <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
     <div class="dial">
-      <label>Vol. (L)</label>
+      <label>Vol.</label>
       <div class="scroll-list" id="volumeList"></div>
     </div>
     <div class="dial">
@@ -137,7 +147,18 @@
     </div>
   </div>
 
+  <a class="recipe-btn" href="recipes.html">📘 Recipes</a>
+
   <script>
+    let isLocked = false;
+    const lockBtn = document.getElementById("lockBtn");
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      lockBtn.textContent = isLocked ? "🔒" : "🔓";
+      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    }
+
     const volumeList = document.getElementById("volumeList");
     const shList = document.getElementById("shList");
     const surfactantList = document.getElementById("surfactantList");
@@ -152,19 +173,17 @@
     }
 
     function createOptionList(container, options, unit, isRatio = false) {
-      // Add hyphen at the beginning and end without the unit
       const hyphenStart = document.createElement("div");
       hyphenStart.className = "scroll-item";
       hyphenStart.textContent = "-";
       container.appendChild(hyphenStart);
 
-      // Set "0" as an option for surfactant and scent
       if (isRatio) {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = 0;
-        item.textContent = "0";
-        container.appendChild(item);
+        const zeroItem = document.createElement("div");
+        zeroItem.className = "scroll-item";
+        zeroItem.dataset.value = 0;
+        zeroItem.textContent = "0";
+        container.appendChild(zeroItem);
       }
 
       options.forEach((val) => {
@@ -206,18 +225,25 @@
       return null;
     }
 
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
+      return {
+        stockSH: parseFloat(settings.shStrength) || 12.5,
+        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
+        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
+        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
+      };
+    }
+
     function calculate() {
       const volume = getCenterValue(volumeList);
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
-      const stockSH = 12.5;
-
-      const shCostPerL = 1.5;
-      const surfCostPerL = 6.0;
-      const scentCostPerL = 8.0;
 
       if ([volume, sh, surfactant, scent].includes(null)) return;
+
+      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
 
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
@@ -240,17 +266,43 @@
     function enableScrollDetection(container) {
       let timeout;
       container.addEventListener("scroll", () => {
+        if (isLocked) {
+          container.scrollTop = container._lastScrollTop || 0;
+          alert("Dial is locked.");
+          return;
+        }
+        container._lastScrollTop = container.scrollTop;
         clearTimeout(timeout);
         timeout = setTimeout(() => calculate(), 200);
       });
     }
 
+    function scrollToValue(container, value, unit = '', isRatio = false) {
+      const items = container.querySelectorAll(".scroll-item");
+      for (let item of items) {
+        if (parseFloat(item.dataset.value) === value) {
+          container.scrollTop = item.offsetTop - container.clientHeight / 2 + item.clientHeight / 2;
+          break;
+        }
+      }
+    }
+
     createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");  // 0.5 step from 0 to 12.5
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
     createOptionList(surfactantList, surfOptions, "", true);
     createOptionList(scentList, scentOptions, "", true);
 
     [volumeList, shList, surfactantList, scentList].forEach(enableScrollDetection);
+
+    // Apply preset mix from recipes.html if present
+    const preset = JSON.parse(localStorage.getItem("presetMix"));
+    if (preset) {
+      scrollToValue(shList, preset.sh, '%');
+      scrollToValue(surfactantList, preset.surf, '', true);
+      scrollToValue(scentList, preset.scent, '', true);
+      localStorage.removeItem("presetMix");
+      setTimeout(() => calculate(), 300);
+    }
   </script>
 </body>
 </html>
