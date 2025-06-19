@@ -71,9 +71,6 @@
       transform: translateY(-50%) scale(1.1);
     }
 
-    .settings-icon { right: 1rem; }
-    .log-icon { right: 3.5rem; }
-    .recipes-icon { right: 6rem; }
     .lock-btn {
       left: 1rem;
       background: transparent;
@@ -211,9 +208,9 @@
     <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
     <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
     BatchCalculator
-    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
-    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
-    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
+    <span class="header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
 
   <div class="dial-container">
@@ -246,6 +243,11 @@
   </div>
 
   <script>
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+
     let isLocked = false;
     const lockBtn = document.getElementById("lockBtn");
 
