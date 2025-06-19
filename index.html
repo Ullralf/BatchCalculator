@@ -1,86 +1,247 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BatchCalculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#0f172a" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <!-- Shared Header -->
-  <div id="header-container"></div>
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <!-- Dial Controls -->
-  <div class="dial-container">
-    <div class="dial">
-      <label for="waterDial">Water</label>
-      <div class="scroll-list" id="waterDial">
-        <div class="scroll-item">5L</div>
-        <div class="scroll-item">10L</div>
-        <div class="scroll-item selected">15L</div>
-        <div class="scroll-item">20L</div>
-        <div class="scroll-item">25L</div>
-      </div>
-    </div>
-    <div class="dial">
-      <label for="shDial">SH</label>
-      <div class="scroll-list" id="shDial">
-        <div class="scroll-item">1%</div>
-        <div class="scroll-item">2%</div>
-        <div class="scroll-item selected">3%</div>
-        <div class="scroll-item">4%</div>
-        <div class="scroll-item">5%</div>
-      </div>
-    </div>
-    <div class="dial">
-      <label for="surfactantDial">Surfactant</label>
-      <div class="scroll-list" id="surfactantDial">
-        <div class="scroll-item">None</div>
-        <div class="scroll-item selected">Light</div>
-        <div class="scroll-item">Medium</div>
-        <div class="scroll-item">Heavy</div>
-      </div>
-    </div>
-    <div class="dial">
-      <label for="scentDial">Scent</label>
-      <div class="scroll-list" id="scentDial">
-        <div class="scroll-item">None</div>
-        <div class="scroll-item selected">Lemon</div>
-        <div class="scroll-item">Cherry</div>
-        <div class="scroll-item">Pine</div>
-      </div>
-    </div>
-  </div>
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
 
-  <!-- Output Section -->
-  <div class="result" id="output">
-    <div class="result-table" id="resultsTable">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
-    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
-  </div>
+/* Dark and Light Mode */
+:root {
+  --primary: #1e293b;
+  --accent: #818cf8;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 1rem;
+}
 
-  <!-- Load Header and Theme Script -->
-  <script src="header.js"></script>
-  <script>
-    function saveLog() {
-      alert("Mix saved to log!");
-    }
+[data-theme="dark"] {
+  --primary: #0f172a;
+  --accent: #4f46e5;
+  --bg-light: #1e293b;
+  --text-dark: #f1f5f9;
+  --card-bg: #1e293b;
+  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
 
-    // Load reusable header
-    fetch('header.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('header-container').innerHTML = data;
-      })
-      .catch(error => console.error("Error loading header:", error));
-  </script>
-</body>
-</html>
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.header-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  opacity: 0.85;
+}
+
+.header-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.settings-icon { right: 1rem; }
+.log-icon { right: 3.5rem; }
+.recipes-icon { right: 6rem; }
+.lock-btn {
+  left: 1rem;
+  background: transparent;
+  border: none;
+  color: white;
+}
+
+.dark-toggle {
+  position: absolute;
+  left: 3.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* Main Content */
+main {
+  padding: 2rem;
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Form Layout */
+label {
+  display: block;
+  margin-top: 1em;
+}
+
+input {
+  width: 100%;
+  padding: 0.5em;
+  margin-top: 0.5em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 1em;
+  margin-top: 2em;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: var(--shadow);
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--accent);
+}
+
+.note {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 1em;
+  text-align: center;
+}
+
+/* Dials Layout */
+.dial-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem auto;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.dial {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  width: 90px;
+  flex: 0 0 auto;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.dial label {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.scroll-list {
+  height: 120px;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+
+.scroll-list::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-list::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 1;
+}
+
+.scroll-item {
+  scroll-snap-align: center;
+  font-size: 1rem;
+  padding: 0.5rem;
+  opacity: 0.5;
+  transition: 0.2s ease;
+}
+
+.scroll-item.selected {
+  font-weight: 600;
+  color: var(--accent);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Result Section */
+.result {
+  position: sticky;
+  bottom: 0;
+  background: var(--card-bg);
+  padding: 1.5rem 1rem;
+  font-size: 1.1rem;
+  border-radius: var(--radius) var(--radius) 0 0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.result-table {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 0.5rem 1rem;
+  text-align: left;
+}
+
+.result-table > div:nth-child(3n) {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.result-table > div:first-child {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+#saveLogBtn {
+  margin-top: 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.2s;
+}
+
+#saveLogBtn:hover {
+  background: #4338ca;
+}
