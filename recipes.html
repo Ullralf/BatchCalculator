@@ -72,6 +72,13 @@
       justify-content: space-between;
       padding: 1em;
     }
+    .editable-note {
+      width: 100%;
+      margin-top: 0.5em;
+      padding: 0.5em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -113,6 +120,22 @@
         icon: "icons/timber.png",
         safe: { sh: 0.75, surf: 0.02, scent: 0.001, note: "Gentle clean to protect wood." },
         heavy: { sh: 1.5, surf: 0.015, scent: 0.002, note: "For blackened timber or grime." }
+      },
+      {
+        name: "Freshly Painted Surface",
+        icon: "icons/freshpaint.png",
+        safe: {
+          sh: 0,
+          surf: 0.015,
+          scent: 0.001,
+          note: "Avoid SH where possible. Gentle surfactant rinse only. Do not allow to dwell."
+        },
+        heavy: {
+          sh: 0.5,
+          surf: 0.015,
+          scent: 0.002,
+          note: "SH must be used with extreme caution. Rinse quickly. Always test a small area first."
+        }
       }
     ];
 
@@ -130,6 +153,7 @@
           <button onclick="toggleMode(${index}, 'heavy')" id="heavy-${index}">Heavy</button>
         </div>
         <div id="details-${index}"></div>
+        <textarea class="editable-note" id="note-${index}" oninput="saveNote(${index})"></textarea>
         <button class="btn" onclick="applyRecipe(${index})">Use This Mix</button>
       `;
 
@@ -148,15 +172,21 @@
       const recipe = recipes[index][mode];
       document.getElementById(`details-${index}`).innerHTML = `
         <p><strong>SH:</strong> ${recipe.sh}%<br>
-        <strong>Surfactant:</strong> ${recipe.surf} (${recipe.surf ? `1:${Math.round(1/recipe.surf)}` : "none"})<br>
-        <strong>Scent:</strong> ${recipe.scent || "none"}</p>
-        <p>${recipe.note}</p>
+        <strong>Surfactant:</strong> ${recipe.surf ? `1:${Math.round(1/recipe.surf)}` : "none"}<br>
+        <strong>Scent:</strong> ${recipe.scent ? `1:${Math.round(1/recipe.scent)}` : "none"}</p>
       `;
+      document.getElementById(`note-${index}`).value = recipe.note;
+    }
+
+    function saveNote(index) {
+      const isHeavy = document.getElementById(`heavy-${index}`).classList.contains('active');
+      const mode = isHeavy ? 'heavy' : 'safe';
+      recipes[index][mode].note = document.getElementById(`note-${index}`).value;
     }
 
     function applyRecipe(index) {
       const isHeavy = document.getElementById(`heavy-${index}`).classList.contains('active');
-      const selected = isHeavy ? recipes[index].heavy : recipes[index].safe;
+      const selected = recipes[index][isHeavy ? 'heavy' : 'safe'];
       localStorage.setItem("presetMix", JSON.stringify(selected));
       alert("Mix applied! Returning to main calculator...");
       window.location.href = "index.html";
