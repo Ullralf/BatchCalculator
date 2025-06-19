@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Settings</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#2c3e50" />
   <style>
     :root {
       --primary: #1e293b;
@@ -24,35 +27,141 @@
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    * {
-      box-sizing: border-box;
+    body {
+      font-family: 'Arial', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
     }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1em;
       text-align: center;
-      overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
+    }
+
+    main {
+      padding: 1em;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+      background: var(--card-bg);
+      color: var(--text-dark);
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 1em;
+      margin-top: 2em;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 1em;
+      text-align: center;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      top: 1em;
+      left: 1em;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <header>
+    Settings
     <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
-    Settings Page
   </header>
+  <main>
+    <label>SH Strength (%):
+      <input type="number" step="0.1" id="shStrength">
+    </label>
+
+    <label>SH Cost ($):
+      <input type="number" step="0.01" id="shCost">
+    </label>
+
+    <label>SH Size (L):
+      <input type="number" step="0.1" id="shSize">
+    </label>
+
+    <label>Surfactant Cost ($):
+      <input type="number" step="0.01" id="surfCost">
+    </label>
+
+    <label>Surfactant Size (L):
+      <input type="number" step="0.1" id="surfSize">
+    </label>
+
+    <label>Scent Cost ($):
+      <input type="number" step="0.01" id="scentCost">
+    </label>
+
+    <label>Scent Size (L):
+      <input type="number" step="0.1" id="scentSize">
+    </label>
+
+    <button onclick="saveSettings()">Save Settings</button>
+    <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
+  </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-    });
+    function saveSettings() {
+      const settings = {
+        shStrength: document.getElementById("shStrength").value,
+        shCost: document.getElementById("shCost").value,
+        shSize: document.getElementById("shSize").value,
+        surfCost: document.getElementById("surfCost").value,
+        surfSize: document.getElementById("surfSize").value,
+        scentCost: document.getElementById("scentCost").value,
+        scentSize: document.getElementById("scentSize").value
+      };
+      localStorage.setItem("batchSettings", JSON.stringify(settings));
+      alert("Settings saved!");
+
+      // Redirect to index.html after saving
+      window.location.href = 'index.html';
+    }
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem("batchSettings"));
+      if (!saved) return;
+      document.getElementById("shStrength").value = saved.shStrength || "";
+      document.getElementById("shCost").value = saved.shCost || "";
+      document.getElementById("shSize").value = saved.shSize || "";
+      document.getElementById("surfCost").value = saved.surfCost || "";
+      document.getElementById("surfSize").value = saved.surfSize || "";
+      document.getElementById("scentCost").value = saved.scentCost || "";
+      document.getElementById("scentSize").value = saved.scentSize || "";
+    }
 
     function toggleDarkMode() {
       const html = document.documentElement;
@@ -61,6 +170,15 @@
       html.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
     }
+
+    // On page load, check for the theme preference in localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+      loadSettings();
+    });
   </script>
 </body>
 </html>
