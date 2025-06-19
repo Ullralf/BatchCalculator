@@ -1,247 +1,312 @@
-/* General Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BatchCalculator</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#0f172a" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e293b;
+      --accent: #818cf8;
+      --bg-light: #0f172a;
+      --text-dark: #f1f5f9;
+      --card-bg: #1e293b;
+      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      --radius: 1rem;
+    }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
-  margin: 0;
-  padding: 0;
-  transition: background 0.3s, color 0.3s;
-}
+    [data-theme="light"] {
+      --primary: #0f172a;
+      --accent: #4f46e5;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
-/* Dark and Light Mode */
-:root {
-  --primary: #1e293b;
-  --accent: #818cf8;
-  --bg-light: #f8fafc;
-  --text-dark: #1e293b;
-  --card-bg: #ffffff;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --radius: 1rem;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-[data-theme="dark"] {
-  --primary: #0f172a;
-  --accent: #4f46e5;
-  --bg-light: #1e293b;
-  --text-dark: #f1f5f9;
-  --card-bg: #1e293b;
-  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-}
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      text-align: center;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
 
-/* Header */
-header {
-  background: var(--primary);
-  color: white;
-  padding: 1rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: var(--shadow);
-}
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
 
-.header-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s ease;
-  opacity: 0.85;
-}
+    .header-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.85;
+    }
 
-.header-icon:hover {
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
-}
+    .header-icon:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
 
-.settings-icon { right: 1rem; }
-.log-icon { right: 3.5rem; }
-.recipes-icon { right: 6rem; }
-.lock-btn {
-  left: 1rem;
-  background: transparent;
-  border: none;
-  color: white;
-}
+    .settings-icon { right: 1rem; }
+    .log-icon { right: 3.5rem; }
+    .recipes-icon { right: 6rem; }
+    .lock-btn {
+      left: 1rem;
+      background: transparent;
+      border: none;
+      color: white;
+    }
 
-.dark-toggle {
-  position: absolute;
-  left: 3.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.3rem;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
+    .dark-toggle {
+      position: absolute;
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
 
-/* Main Content */
-main {
-  padding: 2rem;
-  max-width: 500px;
-  margin: auto;
-}
+    .dial-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem auto;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 0 1rem;
+      scroll-snap-type: x mandatory;
+    }
 
-/* Form Layout */
-label {
-  display: block;
-  margin-top: 1em;
-}
+    .dial {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: var(--shadow);
+      width: 90px;
+      flex: 0 0 auto;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
 
-input {
-  width: 100%;
-  padding: 0.5em;
-  margin-top: 0.5em;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
+    .dial label {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
 
-button {
-  display: block;
-  width: 100%;
-  padding: 1em;
-  margin-top: 2em;
-  background: var(--primary);
-  color: white;
-  border: none;
-  font-size: 1em;
-  cursor: pointer;
-  border-radius: 5px;
-  box-shadow: var(--shadow);
-  transition: background 0.2s;
-}
+    .scroll-list {
+      height: 120px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+    }
 
-button:hover {
-  background: var(--accent);
-}
+    .scroll-list::-webkit-scrollbar {
+      display: none;
+    }
 
-.note {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 1em;
-  text-align: center;
-}
+    .scroll-list::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      z-index: 1;
+    }
 
-/* Dials Layout */
-.dial-container {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem auto;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  padding: 0 1rem;
-  scroll-snap-type: x mandatory;
-}
+    .scroll-item {
+      scroll-snap-align: center;
+      font-size: 1rem;
+      padding: 0.5rem;
+      opacity: 0.5;
+      transition: 0.2s ease;
+    }
 
-.dial {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 1rem;
-  box-shadow: var(--shadow);
-  width: 90px;
-  flex: 0 0 auto;
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.05);
-}
+    .scroll-item.selected {
+      font-weight: 600;
+      color: var(--accent);
+      opacity: 1;
+      transform: scale(1.1);
+    }
 
-.dial label {
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  display: block;
-}
+    .result {
+      position: sticky;
+      bottom: 0;
+      background: var(--card-bg);
+      padding: 1.5rem 1rem;
+      font-size: 1.1rem;
+      border-radius: var(--radius) var(--radius) 0 0;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
 
-.scroll-list {
-  height: 120px;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  position: relative;
-}
+    .result-table {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 0.5rem 1rem;
+      text-align: left;
+    }
 
-.scroll-list::-webkit-scrollbar {
-  display: none;
-}
+    .result-table > div:nth-child(3n) {
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
 
-.scroll-list::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent);
-  z-index: 1;
-}
+    .result-table > div:first-child {
+      font-weight: 600;
+      color: var(--primary);
+    }
 
-.scroll-item {
-  scroll-snap-align: center;
-  font-size: 1rem;
-  padding: 0.5rem;
-  opacity: 0.5;
-  transition: 0.2s ease;
-}
+    #saveLogBtn {
+      margin-top: 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.2s;
+    }
 
-.scroll-item.selected {
-  font-weight: 600;
-  color: var(--accent);
-  opacity: 1;
-  transform: scale(1.1);
-}
+    #saveLogBtn:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+    BatchCalculator
+    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
+  </header>
 
-/* Result Section */
-.result {
-  position: sticky;
-  bottom: 0;
-  background: var(--card-bg);
-  padding: 1.5rem 1rem;
-  font-size: 1.1rem;
-  border-radius: var(--radius) var(--radius) 0 0;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
+  <div class="dial-container">
+    <div class="dial">
+      <label>Vol.</label>
+      <div class="scroll-list" id="volumeList"></div>
+    </div>
+    <div class="dial">
+      <label>SH %</label>
+      <div class="scroll-list" id="shList"></div>
+    </div>
+    <div class="dial">
+      <label>Surfactant</label>
+      <div class="scroll-list" id="surfactantList"></div>
+    </div>
+    <div class="dial">
+      <label>Scent</label>
+      <div class="scroll-list" id="scentList"></div>
+    </div>
+  </div>
 
-.result-table {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  gap: 0.5rem 1rem;
-  text-align: left;
-}
+  <div class="result" id="output">
+    <div class="result-table" id="resultsTable">
+      <div>Cost</div><div>Water</div><div>0.00L</div>
+      <div>$0.00</div><div>SH</div><div>0.00L</div>
+      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
+      <div>$0.00</div><div>Scent</div><div>0.00L</div>
+    </div>
+    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
+  </div>
 
-.result-table > div:nth-child(3n) {
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.5rem;
-}
+  <script>
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
+    }
 
-.result-table > div:first-child {
-  font-weight: 600;
-  color: var(--primary);
-}
+    // On page load, check for the theme preference in localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    });
 
-#saveLogBtn {
-  margin-top: 1rem;
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: background 0.2s;
-}
+    const volumeList = document.getElementById("volumeList");
+    const shList = document.getElementById("shList");
+    const surfactantList = document.getElementById("surfactantList");
+    const scentList = document.getElementById("scentList");
 
-#saveLogBtn:hover {
-  background: #4338ca;
-}
+    function createOptionList(container, options, unit) {
+      options.forEach((val) => {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = val;
+        item.textContent = val + (unit || "");
+        container.appendChild(item);
+      });
+    }
+
+    function getCenterValue(container) {
+      const containerRect = container.getBoundingClientRect();
+      const centerY = containerRect.top + container.clientHeight / 2;
+      const items = container.querySelectorAll(".scroll-item");
+      let closest = null;
+      let minDist = Infinity;
+
+      items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(centerY - itemCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = item;
+        }
+        item.classList.remove("selected");
+      });
+
+      if (closest) {
+        closest.classList.add("selected");
+        return parseFloat(closest.dataset.value);
+      }
+      return null;
+    }
+
+    // Example dials values
+    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(surfactantList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
+    createOptionList(scentList, [0.001, 0.002, 0.01, 0.02, 0.025, 0.0333], "", true);
+  </script>
+</body>
+</html>
