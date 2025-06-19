@@ -28,11 +28,82 @@
       font-size: 1.2em;
       cursor: pointer;
     }
-    .log-icon {
+    .lock-btn {
       position: absolute;
       top: 1em;
-      right: 3em;
+      left: 1em;
       font-size: 1.2em;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
+    }
+    .dial-container {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+      margin: 1em auto;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    .dial {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      border-radius: 10px;
+      padding: 0.5em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      width: 80px;
+      position: relative;
+    }
+    .scroll-list {
+      height: 100px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+    }
+    .scroll-list::-webkit-scrollbar {
+      display: none;
+    }
+    .scroll-item {
+      scroll-snap-align: center;
+      font-size: 1.2em;
+      padding: 0.5em;
+      opacity: 0.4;
+      transition: opacity 0.2s ease;
+    }
+    .scroll-item.selected {
+      font-weight: bold;
+      color: #2c3e50;
+      opacity: 1;
+    }
+    .result {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 1em;
+      font-size: 1.2em;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+    .result-table {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 0.5em 2em;
+      text-align: left;
+    }
+    #saveLogBtn {
+      margin-top: 1em;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      padding: 0.7em 1em;
+      font-size: 1em;
+      border-radius: 5px;
       cursor: pointer;
     }
   </style>
@@ -41,8 +112,204 @@
   <header>
     <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
     BatchCalculator
-    <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
     <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
+
+  <div class="dial-container">
+    <div class="dial">
+      <label>Vol.</label>
+      <div class="scroll-list" id="volumeList"></div>
+    </div>
+    <div class="dial">
+      <label>SH %</label>
+      <div class="scroll-list" id="shList"></div>
+    </div>
+    <div class="dial">
+      <label>Surfactant</label>
+      <div class="scroll-list" id="surfactantList"></div>
+    </div>
+    <div class="dial">
+      <label>Scent</label>
+      <div class="scroll-list" id="scentList"></div>
+    </div>
+  </div>
+
+  <div class="result" id="output">
+    <div class="result-table" id="resultsTable">
+      <div>Cost</div><div>Water</div><div>0.00L</div>
+      <div>$0.00</div><div>SH</div><div>0.00L</div>
+      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
+      <div>$0.00</div><div>Scent</div><div>0.00L</div>
+    </div>
+    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
+  </div>
+
+  <script>
+    let isLocked = false;
+    const lockBtn = document.getElementById("lockBtn");
+
+    function toggleLock() {
+      isLocked = !isLocked;
+      lockBtn.textContent = isLocked ? "🔒" : "🔓";
+      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    }
+
+    const volumeList = document.getElementById("volumeList");
+    const shList = document.getElementById("shList");
+    const surfactantList = document.getElementById("surfactantList");
+    const scentList = document.getElementById("scentList");
+
+    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+
+    function formatRatio(value) {
+      const ratio = Math.round(1 / value);
+      return `1:${ratio}`;
+    }
+
+    function createOptionList(container, options, unit, isRatio = false) {
+      const hyphenStart = document.createElement("div");
+      hyphenStart.className = "scroll-item";
+      hyphenStart.textContent = "-";
+      container.appendChild(hyphenStart);
+
+      if (isRatio) {
+        const zeroItem = document.createElement("div");
+        zeroItem.className = "scroll-item";
+        zeroItem.dataset.value = 0;
+        zeroItem.textContent = "0";
+        container.appendChild(zeroItem);
+      }
+
+      options.forEach((val) => {
+        const item = document.createElement("div");
+        item.className = "scroll-item";
+        item.dataset.value = val;
+        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
+        container.appendChild(item);
+      });
+
+      const hyphenEnd = document.createElement("div");
+      hyphenEnd.className = "scroll-item";
+      hyphenEnd.textContent = "-";
+      container.appendChild(hyphenEnd);
+    }
+
+    function getCenterValue(container) {
+      const containerRect = container.getBoundingClientRect();
+      const centerY = containerRect.top + container.clientHeight / 2;
+      const items = container.querySelectorAll(".scroll-item");
+      let closest = null;
+      let minDist = Infinity;
+
+      items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(centerY - itemCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = item;
+        }
+        item.classList.remove("selected");
+      });
+
+      if (closest) {
+        closest.classList.add("selected");
+        return parseFloat(closest.dataset.value);
+      }
+      return null;
+    }
+
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
+      return {
+        stockSH: parseFloat(settings.shStrength) || 12.5,
+        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
+        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
+        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
+      };
+    }
+
+    function calculate() {
+      const volume = getCenterValue(volumeList);
+      const sh = getCenterValue(shList);
+      const surfactant = getCenterValue(surfactantList);
+      const scent = getCenterValue(scentList);
+
+      if ([volume, sh, surfactant, scent].includes(null)) return;
+
+      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
+
+      const shVol = (sh / stockSH) * volume;
+      const surfVol = surfactant * volume;
+      const scentVol = scent * volume;
+      const water = volume - shVol - surfVol - scentVol;
+
+      const shCost = shVol * shCostPerL;
+      const surfCost = surfVol * surfCostPerL;
+      const scentCost = scentVol * scentCostPerL;
+
+      document.getElementById("resultsTable").innerHTML = `
+        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
+        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
+        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
+        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
+      `;
+    }
+
+    async function saveLog() {
+      const volume = getCenterValue(volumeList);
+      const sh = getCenterValue(shList);
+      const surf = getCenterValue(surfactantList);
+      const scent = getCenterValue(scentList);
+      if ([volume, sh, surf, scent].includes(null)) return;
+
+      const timestamp = new Date().toLocaleString();
+      const client = prompt("Client name?") || "";
+      const address = prompt("Job address?") || "";
+      const notes = prompt("Notes?") || "";
+
+      let gps = "";
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+            finalizeLog(gps);
+          },
+          () => finalizeLog("Unavailable")
+        );
+      } else {
+        finalizeLog("Not supported");
+      }
+
+      function finalizeLog(gpsCoords) {
+        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
+        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+        logs.push(newEntry);
+        localStorage.setItem("mixLogs", JSON.stringify(logs));
+        alert("Mix saved to log!");
+        window.location.href = "cost-log.html";
+      }
+    }
+
+    [volumeList, shList, surfactantList, scentList].forEach(container => {
+      let timeout;
+      container.addEventListener("scroll", () => {
+        if (isLocked) {
+          container.scrollTop = container._lastScrollTop || 0;
+          alert("Dial is locked.");
+          return;
+        }
+        container._lastScrollTop = container.scrollTop;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => calculate(), 200);
+      });
+    });
+
+    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
+    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    createOptionList(surfactantList, surfOptions, "", true);
+    createOptionList(scentList, scentOptions, "", true);
+  </script>
 </body>
 </html>
