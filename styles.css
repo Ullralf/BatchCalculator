@@ -1,0 +1,77 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Dark and Light Mode */
+:root {
+  --primary: #1e293b;
+  --accent: #818cf8;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 1rem;
+}
+
+[data-theme="dark"] {
+  --primary: #0f172a;
+  --accent: #4f46e5;
+  --bg-light: #1e293b;
+  --text-dark: #f1f5f9;
+  --card-bg: #1e293b;
+  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.header-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  opacity: 0.85;
+}
+
+.header-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.settings-icon { right: 1rem; }
+.log-icon { right: 3.5rem; }
+.recipes-icon { right: 6rem; }
+.lock-btn {
+  left: 1rem;
+  background: transparent;
+  border: none;
+  color: white;
+}
+
+.dark-toggle {
+  position: absolute;
