@@ -1,8 +1,15 @@
 <header>
-  <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
-  <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
+  <!-- Lock Button (far left) -->
+  <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
+
+  <!-- Dark Mode Toggle (next to lock) -->
+  <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()">🌙</button>
+
+  <!-- Title -->
   SWCalc
-  <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
-  <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
-  <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
+
+  <!-- Icons (right side) -->
+  <span class="recipes-icon" onclick="window.location.href='recipes.html'">🍳</span>
+  <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
+  <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
 </header>
