@@ -1,3 +1,30 @@
+:root {
+  --primary: #1e293b;
+  --accent: #818cf8;
+  --bg-light: #0f172a;
+  --text-dark: #f1f5f9;
+  --card-bg: #1e293b;
+  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+  --radius: 1rem;
+}
+
+[data-theme="light"] {
+  --primary: #0f172a;
+  --accent: #4f46e5;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+}
+
 /* Header styles */
 header {
   background: var(--primary);
@@ -7,14 +34,27 @@ header {
   font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   position: relative;
   box-shadow: var(--shadow);
 }
 
-/* Lock and Dark Mode buttons */
-.lock-btn {
+.header-icon {
   position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  opacity: 0.85;
+}
+
+.header-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.lock-btn {
   left: 1rem;
   background: transparent;
   border: none;
@@ -33,24 +73,14 @@ header {
   cursor: pointer;
 }
 
-/* Icons container for recipes, log, settings */
-.icon-container {
-  position: absolute;
+.recipes-icon {
+  right: 6rem;
+}
+
+.log-icon {
+  right: 3.5rem;
+}
+
+.settings-icon {
   right: 1rem;
-  display: flex;
-  gap: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.icon-container .recipes-icon,
-.icon-container .log-icon,
-.icon-container .settings-icon {
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.icon-container .recipes-icon:hover,
-.icon-container .log-icon:hover,
-.icon-container .settings-icon:hover {
-  opacity: 0.8;
 }
