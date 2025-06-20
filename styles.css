@@ -34,15 +34,13 @@ header {
   font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;  /* Aligns items to the left and right */
   position: relative;
   box-shadow: var(--shadow);
 }
 
+/* Positioning for icons in the header */
 .header-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 1.5rem;
   cursor: pointer;
   transition: 0.2s ease;
@@ -51,21 +49,16 @@ header {
 
 .header-icon:hover {
   opacity: 1;
-  transform: translateY(-50%) scale(1.1);
+  transform: scale(1.1);
 }
 
 .lock-btn {
-  left: 1rem;
   background: transparent;
   border: none;
   color: white;
 }
 
 .dark-toggle {
-  position: absolute;
-  left: 3.5rem;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 1.3rem;
   background: none;
   border: none;
@@ -73,14 +66,16 @@ header {
   cursor: pointer;
 }
 
-.recipes-icon {
-  right: 6rem;
-}
-
-.log-icon {
-  right: 3.5rem;
-}
-
+/* Move these icons to the right */
+.recipes-icon,
+.log-icon,
 .settings-icon {
-  right: 1rem;
+  margin-left: 1rem; /* Adds spacing between icons */
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Optional: Right-aligned dark toggle button */
+.dark-toggle {
+  margin-left: 1rem;  /* Add spacing if needed */
 }
