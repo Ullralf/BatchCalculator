@@ -9,6 +9,111 @@
   <meta name="theme-color" content="#2c3e50" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Reset and basic styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    /* Header section */
+    #header-container {
+      margin-bottom: 20px;
+    }
+
+    /* Main content section */
+    main {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    /* Form and labels */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    /* Button */
+    .btn-save {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: var(--primary);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-save:hover {
+      background: var(--accent);
+    }
+
+    /* Note section */
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* Responsive design for mobile */
+    @media (max-width: 480px) {
+      main {
+        padding: 15px;
+      }
+
+      label {
+        font-size: 14px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+      .btn-save {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 20px;
+      }
+
+      input {
+        font-size: 15px;
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Header Section -->
