@@ -11,58 +11,68 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Header Container -->
+  <!-- Header Section -->
   <div id="header-container"></div>
 
-  <!-- Main Content -->
+  <!-- Main Content Section -->
   <main>
-    <label>SH Strength (%):
-      <input type="number" step="0.1" id="shStrength">
-    </label>
+    <form id="settingsForm">
+      <div class="form-group">
+        <label for="shStrength">SH Strength (%):</label>
+        <input type="number" id="shStrength" step="0.1">
+      </div>
 
-    <label>SH Cost ($):
-      <input type="number" step="0.01" id="shCost">
-    </label>
+      <div class="form-group">
+        <label for="shCost">SH Cost ($):</label>
+        <input type="number" id="shCost" step="0.01">
+      </div>
 
-    <label>SH Size (L):
-      <input type="number" step="0.1" id="shSize">
-    </label>
+      <div class="form-group">
+        <label for="shSize">SH Size (L):</label>
+        <input type="number" id="shSize" step="0.1">
+      </div>
 
-    <label>Surfactant Cost ($):
-      <input type="number" step="0.01" id="surfCost">
-    </label>
+      <div class="form-group">
+        <label for="surfCost">Surfactant Cost ($):</label>
+        <input type="number" id="surfCost" step="0.01">
+      </div>
 
-    <label>Surfactant Size (L):
-      <input type="number" step="0.1" id="surfSize">
-    </label>
+      <div class="form-group">
+        <label for="surfSize">Surfactant Size (L):</label>
+        <input type="number" id="surfSize" step="0.1">
+      </div>
 
-    <label>Scent Cost ($):
-      <input type="number" step="0.01" id="scentCost">
-    </label>
+      <div class="form-group">
+        <label for="scentCost">Scent Cost ($):</label>
+        <input type="number" id="scentCost" step="0.01">
+      </div>
 
-    <label>Scent Size (L):
-      <input type="number" step="0.1" id="scentSize">
-    </label>
+      <div class="form-group">
+        <label for="scentSize">Scent Size (L):</label>
+        <input type="number" id="scentSize" step="0.1">
+      </div>
 
-    <button onclick="saveSettings()">Save Settings</button>
-    <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
+      <button type="button" class="btn-save" onclick="saveSettings()">Save Settings</button>
+    </form>
+
+    <div class="note">
+      Settings are saved to your device and used in mix and cost calculations.
+    </div>
   </main>
 
-  <!-- Load Header and initialize it -->
+  <!-- Scripts -->
   <script src="header.js"></script>
   <script>
-    // Load header.html into the page dynamically
+    // Load header dynamically
     fetch('header.html')
       .then(response => response.text())
       .then(data => {
-        // Inject the header HTML into the page
-        const container = document.getElementById('header-container');
-        container.innerHTML = data;
-        initHeader(); // Ensure header.js initializes everything, like buttons
+        document.getElementById('header-container').innerHTML = data;
+        initHeader(); // Initialize header actions
       })
       .catch(error => console.error('Error loading header:', error));
 
-    // Save settings to local storage
+    // Save form data to localStorage
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
@@ -75,25 +85,25 @@
       };
       localStorage.setItem("batchSettings", JSON.stringify(settings));
       alert("Settings saved!");
-      window.location.href = 'index.html';
+      window.location.href = 'index.html'; // Redirect after save
     }
 
-    // Load saved settings from local storage when the page loads
+    // Load saved settings into the form on page load
     function loadSettings() {
       const saved = JSON.parse(localStorage.getItem("batchSettings"));
-      if (!saved) return;
-      document.getElementById("shStrength").value = saved.shStrength || "";
-      document.getElementById("shCost").value = saved.shCost || "";
-      document.getElementById("shSize").value = saved.shSize || "";
-      document.getElementById("surfCost").value = saved.surfCost || "";
-      document.getElementById("surfSize").value = saved.surfSize || "";
-      document.getElementById("scentCost").value = saved.scentCost || "";
-      document.getElementById("scentSize").value = saved.scentSize || "";
+      if (saved) {
+        document.getElementById("shStrength").value = saved.shStrength || "";
+        document.getElementById("shCost").value = saved.shCost || "";
+        document.getElementById("shSize").value = saved.shSize || "";
+        document.getElementById("surfCost").value = saved.surfCost || "";
+        document.getElementById("surfSize").value = saved.surfSize || "";
+        document.getElementById("scentCost").value = saved.scentCost || "";
+        document.getElementById("scentSize").value = saved.scentSize || "";
+      }
     }
 
-    // Call loadSettings on page load to prefill the form
-    loadSettings();
+    // Call loadSettings on page load
+    window.onload = loadSettings;
   </script>
 </body>
 </html>
-
