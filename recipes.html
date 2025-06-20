@@ -20,10 +20,20 @@
       gap: 0.75rem;
       margin-bottom: 1rem;
     }
-    .recipe-card img {
+    .recipe-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .recipe-header img {
       width: 36px;
       height: 36px;
-      align-self: flex-end;
+      flex-shrink: 0;
+    }
+    .recipe-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
     }
     .toggle-btns {
       display: flex;
@@ -137,8 +147,10 @@
       card.className = "recipe-card";
 
       card.innerHTML = `
-        <img src="${r.icon}" alt="icon">
-        <h3>${r.name}</h3>
+        <div class="recipe-header">
+          <img src="${r.icon}" alt="icon">
+          <h3>${r.name}</h3>
+        </div>
         <div class="toggle-btns">
           <button onclick="toggleMode(${index}, 'safe')" id="safe-${index}" class="active">Safe</button>
           <button onclick="toggleMode(${index}, 'heavy')" id="heavy-${index}">Heavy</button>
