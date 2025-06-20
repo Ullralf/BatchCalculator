@@ -25,3 +25,4 @@ document.addEventListener("DOMContentLoaded", () => {
       if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
     });
 });
+ 
