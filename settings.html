@@ -79,17 +79,18 @@
     <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
   </main>
 
-  <script src="header.js"></script>
+  <!-- Load the header.js script here -->
   <script>
     fetch('header.html')
       .then(response => response.text())
       .then(data => {
         const container = document.getElementById('header-container');
-        container.outerHTML = data;
-        if (typeof initHeader === 'function') initHeader();
+        container.innerHTML = data; // Use innerHTML to load the header content
+        initHeader(); // Initialize the header (this should handle lock and dark mode)
       })
       .catch(error => console.error("Error loading header:", error));
 
+    // Function to save settings
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
@@ -105,6 +106,7 @@
       window.location.href = 'index.html';
     }
 
+    // Load saved settings when the page loads
     function loadSettings() {
       const saved = JSON.parse(localStorage.getItem("batchSettings"));
       if (!saved) return;
@@ -119,5 +121,8 @@
 
     loadSettings();
   </script>
+
+  <!-- Ensure header.js is loaded after the header content -->
+  <script src="header.js"></script>
 </body>
 </html>
