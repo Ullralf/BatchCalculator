@@ -86,7 +86,7 @@
       .then(data => {
         const container = document.getElementById('header-container');
         container.outerHTML = data;
-        initHeader();
+        if (typeof initHeader === 'function') initHeader();
       })
       .catch(error => console.error("Error loading header:", error));
 
