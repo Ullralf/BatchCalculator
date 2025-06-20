@@ -1,87 +1,57 @@
-:root {
-  --primary: #1e293b;
-  --accent: #818cf8;
-  --bg-light: #0f172a;
-  --text-dark: #f1f5f9;
-  --card-bg: #1e293b;
-  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-  --radius: 1rem;
-}
-
-[data-theme="light"] {
-  --primary: #0f172a;
-  --accent: #4f46e5;
-  --bg-light: #f8fafc;
-  --text-dark: #1e293b;
-  --card-bg: #ffffff;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
-  margin: 0;
-  padding: 0;
-}
-
-/* Header styles */
 header {
-  background: var(--primary);
+  background-color: #2c3e50;
   color: white;
-  padding: 1rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1em;
+  font-size: 1.5em;
   position: relative;
-  box-shadow: var(--shadow);
+  text-align: center;
 }
 
-.header-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s ease;
-  opacity: 0.85;
-}
-
-.header-icon:hover {
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
-}
-
+/* Lock (far left) */
 .lock-btn {
-  left: 1rem;
-  background: transparent;
-  border: none;
-  color: white;
-}
-
-.dark-toggle {
   position: absolute;
-  left: 3.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.3rem;
+  top: 1em;
+  left: 1em;
+  font-size: 1.2em;
   background: none;
   border: none;
   color: white;
   cursor: pointer;
 }
 
+/* Dark Mode (next to lock) */
+.dark-toggle {
+  position: absolute;
+  top: 1em;
+  left: 3em;
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* Icons aligned far right */
 .recipes-icon {
-  right: 6rem;
+  position: absolute;
+  top: 1em;
+  right: 5em;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 .log-icon {
-  right: 3.5rem;
+  position: absolute;
+  top: 1em;
+  right: 3em;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 .settings-icon {
-  right: 1rem;
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  font-size: 1.2em;
+  cursor: pointer;
 }
- 
