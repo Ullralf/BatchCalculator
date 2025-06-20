@@ -14,6 +14,13 @@
   <div id="header-container"></div>
 
   <main class="calculator">
+    <div class="dial-buttons">
+      <button onclick="applyPreset('low')">Low</button>
+      <button onclick="applyPreset('medium')">Medium</button>
+      <button onclick="applyPreset('high')">High</button>
+      <button onclick="loadPreset()">Load Preset</button>
+    </div>
+
     <div class="input-section">
       <label>Total Batch Size (L):
         <input type="number" id="totalLitres" step="0.1">
@@ -36,17 +43,13 @@
 
     <div class="results" id="results" style="display: none;">
       <h2>Mix Results</h2>
-      <p><strong>Water:</strong> <span id="waterLitres"></span> L</p>
-      <p><strong>SH:</strong> <span id="shLitres"></span> L</p>
-      <p><strong>Surfactant:</strong> <span id="surfactantLitres"></span> L</p>
-      <p><strong>Scent:</strong> <span id="scentLitres"></span> L</p>
-    </div>
-
-    <div class="dial-buttons">
-      <button onclick="applyPreset('low')">Low</button>
-      <button onclick="applyPreset('medium')">Medium</button>
-      <button onclick="applyPreset('high')">High</button>
-      <button onclick="loadPreset()">Load Preset</button>
+      <table>
+        <tr><th>Component</th><th>Litres</th></tr>
+        <tr><td>Water</td><td id="waterLitres"></td></tr>
+        <tr><td>SH</td><td id="shLitres"></td></tr>
+        <tr><td>Surfactant</td><td id="surfactantLitres"></td></tr>
+        <tr><td>Scent</td><td id="scentLitres"></td></tr>
+      </table>
     </div>
   </main>
 
