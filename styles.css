@@ -1,81 +1,11 @@
-:root {
-  --primary: #1e293b;
-  --accent: #818cf8;
-  --bg-light: #0f172a;
-  --text-dark: #f1f5f9;
-  --card-bg: #1e293b;
-  --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-  --radius: 1rem;
-}
-
-[data-theme="light"] {
-  --primary: #0f172a;
-  --accent: #4f46e5;
-  --bg-light: #f8fafc;
-  --text-dark: #1e293b;
-  --card-bg: #ffffff;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
-  margin: 0;
-  padding: 0;
-}
-
-/* Header styles */
-header {
-  background: var(--primary);
-  color: white;
-  padding: 1rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;  /* Aligns items to the left and right */
-  position: relative;
-  box-shadow: var(--shadow);
-}
-
-/* Positioning for icons in the header */
-.header-icon {
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s ease;
-  opacity: 0.85;
-}
-
-.header-icon:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.lock-btn {
-  background: transparent;
-  border: none;
-  color: white;
-}
-
-.dark-toggle {
-  font-size: 1.3rem;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-/* Move these icons to the right */
-.recipes-icon,
-.log-icon,
-.settings-icon {
-  margin-left: 1rem; /* Adds spacing between icons */
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-/* Optional: Right-aligned dark toggle button */
-.dark-toggle {
-  margin-left: 1rem;  /* Add spacing if needed */
-}
+<header>
+  <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+  
+  <!-- Right-aligned icons -->
+  <div class="icon-container">
+    <span class="recipes-icon" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
+  </div>
+</header>
