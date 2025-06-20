@@ -1,113 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Settings</title>
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0f172a" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>Header Only Page</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* General header style */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background: #1f2937;
-      color: white;
-    }
-    header button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    header button:hover {
-      color: #4b9ef3;
-    }
-    header .lock-btn {
-      font-size: 1.5rem;
-    }
-    header .recipes-icon, .header-icons span {
-      margin-left: 20px;
-      cursor: pointer;
-    }
-
-    /* Page content styles */
-    .container {
-      padding: 20px;
-    }
-  </style>
 </head>
 <body>
-  <div id="header-container"></div>
-
-  <div class="container">
-    <!-- Settings form or content here -->
-    <h2>Settings</h2>
-    <p>Configure your batch calculator settings below:</p>
-    <!-- Example form inputs -->
-    <form id="settingsForm">
-      <label for="shStrength">SH Strength (%)</label>
-      <input type="number" id="shStrength" name="shStrength" placeholder="12.5">
-      <br>
-      <label for="shCost">SH Cost ($/L)</label>
-      <input type="number" id="shCost" name="shCost" placeholder="1.5">
-      <br>
-      <label for="surfCost">Surfactant Cost ($/L)</label>
-      <input type="number" id="surfCost" name="surfCost" placeholder="6.0">
-      <br>
-      <label for="scentCost">Scent Cost ($/L)</label>
-      <input type="number" id="scentCost" name="scentCost" placeholder="8.0">
-      <br>
-      <button type="submit">Save Settings</button>
-    </form>
+  <!-- The header will be dynamically loaded from header.html -->
+  <script src="header.js"></script>
+  
+  <!-- Main content can go here -->
+  <div class="content">
+    <h1>Welcome to the BatchCalculator!</h1>
+    <p>Explore the header functionality!</p>
   </div>
-
-  <script>
-    // Dynamically load the header
-    document.getElementById('header-container').innerHTML = `
-      <header>
-        <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
-        Settings
-        <span class="recipes-icon" onclick="window.location.href='recipes.html'">🍳</span>
-        <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
-        <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
-      </header>
-    `;
-
-    let isLocked = false;
-    const lockBtn = document.getElementById("lockBtn");
-
-    function toggleLock() {
-      isLocked = !isLocked;
-      lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Settings are now locked." : "Settings are now unlocked.");
-    }
-
-    // Handle form submission (Save settings)
-    document.getElementById("settingsForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      
-      const shStrength = document.getElementById("shStrength").value;
-      const shCost = document.getElementById("shCost").value;
-      const surfCost = document.getElementById("surfCost").value;
-      const scentCost = document.getElementById("scentCost").value;
-
-      const settings = {
-        shStrength,
-        shCost,
-        surfCost,
-        scentCost
-      };
-
-      localStorage.setItem("batchSettings", JSON.stringify(settings));
-      alert("Settings saved!");
-    });
-  </script>
 </body>
 </html>
