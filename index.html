@@ -3,130 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mix Recipes</title>
+  <title>Settings</title>
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .recipe-card {
-      background: var(--card-bg);
-      padding: 1rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    /* General header style */
+    header {
       display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    .recipe-header {
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.75rem;
+      padding: 10px;
+      background: #1f2937;
+      color: white;
     }
-    .recipe-header img {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
+    header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
     }
-    .recipe-header h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 0;
+    header button:hover {
+      color: #4b9ef3;
     }
-    .toggle-btns {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+    header .lock-btn {
+      font-size: 1.5rem;
     }
-    .toggle-btns button {
-      flex: 1 1 45%;
+    header .recipes-icon, .header-icons span {
+      margin-left: 20px;
+      cursor: pointer;
     }
-    .editable-note {
-      width: 100%;
-      min-height: 60px;
-      padding: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--primary);
-      background: var(--bg-light);
-      color: var(--text-dark);
-      resize: vertical;
-    }
-    .footer-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-      max-width: 700px;
-      margin: 1rem auto;
-    }
-    @media (min-width: 600px) {
-      .footer-buttons {
-        flex-direction: row;
-        justify-content: space-between;
-      }
+
+    /* Page content styles */
+    .container {
+      padding: 20px;
     }
   </style>
 </head>
 <body>
   <div id="header-container"></div>
 
-  <!-- Main Content Section -->
-  <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
+  <div class="container">
+    <!-- Settings form or content here -->
+    <h2>Settings</h2>
+    <p>Configure your batch calculator settings below:</p>
+    <!-- Example form inputs -->
+    <form id="settingsForm">
+      <label for="shStrength">SH Strength (%)</label>
+      <input type="number" id="shStrength" name="shStrength" placeholder="12.5">
+      <br>
+      <label for="shCost">SH Cost ($/L)</label>
+      <input type="number" id="shCost" name="shCost" placeholder="1.5">
+      <br>
+      <label for="surfCost">Surfactant Cost ($/L)</label>
+      <input type="number" id="surfCost" name="surfCost" placeholder="6.0">
+      <br>
+      <label for="scentCost">Scent Cost ($/L)</label>
+      <input type="number" id="scentCost" name="scentCost" placeholder="8.0">
+      <br>
+      <button type="submit">Save Settings</button>
+    </form>
   </div>
 
-  <div class="result" id="output">
-    <div class="result-table" id="resultsTable">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
-    </div>
-    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
-  </div>
-
-  <div class="footer-buttons">
-    <button class="btn" onclick="createCustomRecipe()">➕ Custom Recipe</button>
-    <button class="btn" onclick="window.location.href='index.html'">⬅ Return</button>
-  </div>
-
-  <script src="header.js"></script>
   <script>
-    fetch('header.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('header-container').innerHTML = data;
-      })
-      .catch(error => console.error("Error loading header:", error));
-
-    // Dynamically load header section
-    document.getElementById('header-container').innerHTML = ` 
-      <div id="header-container">
-        <header>
-          <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
-          BatchCalculator
-          <span class="recipes-icon" onclick="window.location.href='recipes.html'">🍳</span>
-          <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
-          <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
-        </header>
-      </div>
+    // Dynamically load the header
+    document.getElementById('header-container').innerHTML = `
+      <header>
+        <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔓</button>
+        Settings
+        <span class="recipes-icon" onclick="window.location.href='recipes.html'">🍳</span>
+        <span class="log-icon" onclick="window.location.href='cost-log.html'">📜</span>
+        <span class="settings-icon" onclick="window.location.href='settings.html'">⚙️</span>
+      </header>
     `;
 
     let isLocked = false;
@@ -135,165 +86,28 @@
     function toggleLock() {
       isLocked = !isLocked;
       lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+      alert(isLocked ? "Settings are now locked." : "Settings are now unlocked.");
     }
 
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
+    // Handle form submission (Save settings)
+    document.getElementById("settingsForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const shStrength = document.getElementById("shStrength").value;
+      const shCost = document.getElementById("shCost").value;
+      const surfCost = document.getElementById("surfCost").value;
+      const scentCost = document.getElementById("scentCost").value;
 
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
-    }
-
-    function createOptionList(container, options, unit, isRatio = false) {
-      const hyphenStart = document.createElement("div");
-      hyphenStart.className = "scroll-item";
-      hyphenStart.textContent = "-";
-      container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
-      }
-
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
-        container.appendChild(item);
-      });
-
-      const hyphenEnd = document.createElement("div");
-      hyphenEnd.className = "scroll-item";
-      hyphenEnd.textContent = "-";
-      container.appendChild(hyphenEnd);
-    }
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
-      return {
-        stockSH: parseFloat(settings.shStrength) || 12.5,
-        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
-        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
-        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
+      const settings = {
+        shStrength,
+        shCost,
+        surfCost,
+        scentCost
       };
-    }
 
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("resultsTable").innerHTML = `
-        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-      `;
-    }
-
-    async function saveLog() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surf = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surf, scent].includes(null)) return;
-
-      const timestamp = new Date().toLocaleString();
-      const client = prompt("Client name?") || "";
-      const address = prompt("Job address?") || "";
-      const notes = prompt("Notes?") || "";
-
-      let gps = "";
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-            finalizeLog(gps);
-          },
-          () => finalizeLog("Unavailable")
-        );
-      } else {
-        finalizeLog("Not supported");
-      }
-
-      function finalizeLog(gpsCoords) {
-        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
-        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-        logs.push(newEntry);
-        localStorage.setItem("mixLogs", JSON.stringify(logs));
-        alert("Mix saved to log!");
-        window.location.href = "cost-log.html";
-      }
-    }
-
-    [volumeList, shList, surfactantList, scentList].forEach(container => {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        if (isLocked) {
-          container.scrollTop = container._lastScrollTop || 0;
-          alert("Dial is locked.");
-          return;
-        }
-        container._lastScrollTop = container.scrollTop;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
+      localStorage.setItem("batchSettings", JSON.stringify(settings));
+      alert("Settings saved!");
     });
-
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
   </script>
 </body>
 </html>
