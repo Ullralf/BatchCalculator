@@ -9,43 +9,12 @@
   <meta name="theme-color" content="#2c3e50" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    main {
-      padding: 1em;
-      max-width: 500px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 1em;
-    }
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 1em;
-      margin-top: 2em;
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .note {
-      font-size: 0.9em;
-      color: #666;
-      margin-top: 1em;
-      text-align: center;
-    }
-  </style>
 </head>
 <body>
+  <!-- Header Container -->
   <div id="header-container"></div>
+
+  <!-- Main Content -->
   <main>
     <label>SH Strength (%):
       <input type="number" step="0.1" id="shStrength">
@@ -79,17 +48,21 @@
     <div class="note">Settings are saved to your device and used in mix and cost calculations.</div>
   </main>
 
+  <!-- Load Header and initialize it -->
   <script src="header.js"></script>
   <script>
+    // Load header.html into the page dynamically
     fetch('header.html')
       .then(response => response.text())
       .then(data => {
+        // Inject the header HTML into the page
         const container = document.getElementById('header-container');
-        container.outerHTML = data;
-        initHeader();
+        container.innerHTML = data;
+        initHeader(); // Ensure header.js initializes everything, like buttons
       })
-      .catch(error => console.error("Error loading header:", error));
+      .catch(error => console.error('Error loading header:', error));
 
+    // Save settings to local storage
     function saveSettings() {
       const settings = {
         shStrength: document.getElementById("shStrength").value,
@@ -105,6 +78,7 @@
       window.location.href = 'index.html';
     }
 
+    // Load saved settings from local storage when the page loads
     function loadSettings() {
       const saved = JSON.parse(localStorage.getItem("batchSettings"));
       if (!saved) return;
@@ -117,6 +91,7 @@
       document.getElementById("scentSize").value = saved.scentSize || "";
     }
 
+    // Call loadSettings on page load to prefill the form
     loadSettings();
   </script>
 </body>
