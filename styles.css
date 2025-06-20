@@ -1,43 +1,59 @@
+/* Header styles */
 header {
-  background-color: #2c3e50;
+  background: var(--primary);
   color: white;
-  padding: 1em;
-  font-size: 1.5em;
+  padding: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.header-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  opacity: 0.85;
+}
+
+.header-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
 }
 
 .lock-btn {
-  position: absolute;
-  top: 1em;
-  left: 1em;
-  font-size: 1.2em;
-  cursor: pointer;
-  background: none;
+  left: 1rem;
+  background: transparent;
   border: none;
   color: white;
 }
 
-.recipes-icon {
+.dark-toggle {
   position: absolute;
-  top: 1em;
-  right: 5em;
-  font-size: 1.2em;
+  left: 3.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  color: white;
   cursor: pointer;
+}
+
+.recipes-icon {
+  right: 6rem;
 }
 
 .log-icon {
-  position: absolute;
-  top: 1em;
-  right: 3em;
-  font-size: 1.2em;
-  cursor: pointer;
+  right: 3.5rem;
 }
 
 .settings-icon {
-  position: absolute;
-  top: 1em;
-  right: 1em;
-  font-size: 1.2em;
-  cursor: pointer;
+  right: 1rem;
 }
