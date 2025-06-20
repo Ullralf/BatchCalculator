@@ -13,57 +13,42 @@
 <body>
   <div id="header-container"></div>
 
-  <main>
-    <div class="dial-container">
-      <div class="dial">
-        <label>Vol.</label>
-        <div class="scroll-list" id="volumeList"></div>
-      </div>
-      <div class="dial">
-        <label>SH %</label>
-        <div class="scroll-list" id="shList"></div>
-      </div>
-      <div class="dial">
-        <label>Surfactant</label>
-        <div class="scroll-list" id="surfactantList"></div>
-      </div>
-      <div class="dial">
-        <label>Scent</label>
-        <div class="scroll-list" id="scentList"></div>
-      </div>
+  <div class="dial-container">
+    <div class="dial">
+      <label>Vol.</label>
+      <div class="scroll-list" id="volumeList"></div>
     </div>
-
-    <div class="result" id="output">
-      <div class="result-table" id="resultsTable">
-        <div>Cost</div><div>Water</div><div>0.00L</div>
-        <div>$0.00</div><div>SH</div><div>0.00L</div>
-        <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-        <div>$0.00</div><div>Scent</div><div>0.00L</div>
-      </div>
-      <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
+    <div class="dial">
+      <label>SH %</label>
+      <div class="scroll-list" id="shList"></div>
     </div>
-  </main>
+    <div class="dial">
+      <label>Surfactant</label>
+      <div class="scroll-list" id="surfactantList"></div>
+    </div>
+    <div class="dial">
+      <label>Scent</label>
+      <div class="scroll-list" id="scentList"></div>
+    </div>
+  </div>
 
-  <script src="header.js"></script>
-  <script>
-    // Inject shared header
-    fetch('header.html')
-      .then(res => res.text())
-      .then(data => {
-        const container = document.getElementById('header-container');
-        container.outerHTML = data;
-        if (typeof initHeader === 'function') initHeader();
-      })
-      .catch(err => console.error('Failed to load header:', err));
-  </script>
+  <div class="result" id="output">
+    <div class="result-table" id="resultsTable">
+      <div>Cost</div><div>Water</div><div>0.00L</div>
+      <div>$0.00</div><div>SH</div><div>0.00L</div>
+      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
+      <div>$0.00</div><div>Scent</div><div>0.00L</div>
+    </div>
+    <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
+  </div>
 
   <script>
     let isLocked = false;
+    const lockBtn = document.getElementById("lockBtn");
 
     function toggleLock() {
       isLocked = !isLocked;
-      const btn = document.querySelector(".lock-btn");
-      if (btn) btn.textContent = isLocked ? "🔒" : "🔓";
+      lockBtn.textContent = isLocked ? "🔒" : "🔓";
       alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
     }
 
@@ -148,9 +133,11 @@
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
+
       if ([volume, sh, surfactant, scent].includes(null)) return;
 
       const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
+
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
       const scentVol = scent * volume;
@@ -183,7 +170,10 @@
       let gps = "";
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          pos => finalizeLog(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
+          pos => {
+            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+            finalizeLog(gps);
+          },
           () => finalizeLog("Unavailable")
         );
       } else {
