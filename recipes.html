@@ -9,11 +9,52 @@
   <meta name="theme-color" content="#0f172a" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .recipe-card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .recipe-card img {
+      width: 40px;
+      height: 40px;
+      align-self: flex-end;
+    }
+    .toggle-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .toggle-btns button {
+      flex: 1;
+    }
+    .editable-note {
+      width: 100%;
+      min-height: 60px;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--primary);
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      max-width: 700px;
+      margin: auto;
+    }
+  </style>
 </head>
 <body>
   <div id="header-container"></div>
 
-  <div class="container" id="recipeContainer"></div>
+  <main class="container" id="recipeContainer"></main>
+
   <div class="footer-buttons">
     <button class="btn" onclick="createCustomRecipe()">➕ Custom Recipe</button>
     <button class="btn" onclick="window.location.href='index.html'">⬅ Return</button>
