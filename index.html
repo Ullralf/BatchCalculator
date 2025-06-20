@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Batch Calculator</title>
+  <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2c3e50" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" /> <!-- External Stylesheet -->
+  <script src="header.js" defer></script> <!-- External Header JS -->
 </head>
 <body>
-  <div id="header-container"></div>
+
+  <!-- Include external header -->
+  <div id="header-container"></div> 
 
   <div class="dial-container">
     <div class="dial">
@@ -41,16 +44,7 @@
     <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
   </div>
 
-  <script src="header.js"></script>
   <script>
-    fetch('header.html')
-      .then(res => res.text())
-      .then(data => {
-        const container = document.getElementById('header-container');
-        container.outerHTML = data;
-        if (typeof initHeader === 'function') initHeader();
-      });
-
     let isLocked = false;
     function toggleLock() {
       isLocked = !isLocked;
