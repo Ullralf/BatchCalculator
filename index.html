@@ -14,22 +14,10 @@
   <div id="header-container"></div>
 
   <div class="dial-container">
-    <div class="dial">
-      <label>Vol.</label>
-      <div class="scroll-list" id="volumeList"></div>
-    </div>
-    <div class="dial">
-      <label>SH %</label>
-      <div class="scroll-list" id="shList"></div>
-    </div>
-    <div class="dial">
-      <label>Surfactant</label>
-      <div class="scroll-list" id="surfactantList"></div>
-    </div>
-    <div class="dial">
-      <label>Scent</label>
-      <div class="scroll-list" id="scentList"></div>
-    </div>
+    <div class="dial"><label>Vol.</label><div class="scroll-list" id="volumeList"></div></div>
+    <div class="dial"><label>SH %</label><div class="scroll-list" id="shList"></div></div>
+    <div class="dial"><label>Surfactant</label><div class="scroll-list" id="surfactantList"></div></div>
+    <div class="dial"><label>Scent</label><div class="scroll-list" id="scentList"></div></div>
   </div>
 
   <div class="result" id="output">
@@ -40,6 +28,20 @@
       <div>$0.00</div><div>Scent</div><div>0.00L</div>
     </div>
     <button id="saveLogBtn" onclick="saveLog()">💾 Save Mix to Log</button>
+    <button id="addToBatchBtn" onclick="showAddToBatch()">➕ Add to Existing Batch</button>
+  </div>
+
+  <!-- Add-to-Batch Modal -->
+  <div id="addBatchModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:#fff; padding:1rem; border-radius:12px; box-shadow:0 0 10px #000; z-index:1000;">
+    <h3>Add to Existing Batch</h3>
+    <label for="batchDropdown">Select a batch:</label>
+    <select id="batchDropdown" style="width:100%; margin-bottom:1rem;"></select>
+
+    <label>Extra Volume (L):</label>
+    <input type="number" id="extraVolume" placeholder="e.g. 20" style="width:100%; margin-bottom:1rem;" />
+
+    <button onclick="addToExistingBatch()">✅ Add Volume</button>
+    <button onclick="closeAddToBatch()" style="float:right;">❌ Cancel</button>
   </div>
 
   <script src="header.js"></script>
@@ -134,11 +136,9 @@
       const sh = getCenterValue(shList);
       const surfactant = getCenterValue(surfactantList);
       const scent = getCenterValue(scentList);
-
       if ([volume, sh, surfactant, scent].includes(null)) return;
 
       const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-
       const shVol = (sh / stockSH) * volume;
       const surfVol = surfactant * volume;
       const scentVol = scent * volume;
@@ -189,6 +189,58 @@
         alert("Mix saved to log!");
         window.location.href = "cost-log.html";
       }
+    }
+
+    function showAddToBatch() {
+      const dropdown = document.getElementById("batchDropdown");
+      dropdown.innerHTML = "";
+      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+
+      logs.forEach((log, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${log.timestamp} - ${log.client || "No client"}`;
+        dropdown.appendChild(option);
+      });
+
+      document.getElementById("addBatchModal").style.display = "block";
+    }
+
+    function closeAddToBatch() {
+      document.getElementById("addBatchModal").style.display = "none";
+    }
+
+    function addToExistingBatch() {
+      const index = document.getElementById("batchDropdown").value;
+      const extraVolume = parseFloat(document.getElementById("extraVolume").value);
+      if (!index || isNaN(extraVolume) || extraVolume <= 0) {
+        alert("Please select a batch and enter a valid volume.");
+        return;
+      }
+
+      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+      const log = logs[index];
+
+      const volume = getCenterValue(volumeList);
+      const sh = getCenterValue(shList);
+      const surf = getCenterValue(surfactantList);
+      const scent = getCenterValue(scentList);
+      if ([volume, sh, surf, scent].includes(null)) return;
+
+      const { stockSH } = loadSettings();
+      const addedSH = (sh / stockSH) * extraVolume;
+      const addedSurfactant = surf * extraVolume;
+      const addedScent = scent * extraVolume;
+
+      log.sh += addedSH;
+      log.surf += addedSurfactant;
+      log.scent += addedScent;
+      log.notes = (log.notes || "") + `\n➕ Added ${extraVolume}L (${addedSH.toFixed(2)}L SH, ${addedSurfactant.toFixed(2)}L Surfactant, ${addedScent.toFixed(2)}L Scent)`;
+
+      logs[index] = log;
+      localStorage.setItem("mixLogs", JSON.stringify(logs));
+      alert("Existing batch updated!");
+      closeAddToBatch();
     }
 
     [volumeList, shList, surfactantList, scentList].forEach(container => {
