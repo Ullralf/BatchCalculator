@@ -110,8 +110,12 @@ header {
 .result-table {
   display: grid;
   grid-template-columns: auto auto auto;
-  gap: 0.5em 2em;
-  text-align: left;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-top: 1rem;
 }
 
 .action-btn {
