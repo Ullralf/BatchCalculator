@@ -32,15 +32,18 @@
   </div>
 
   <!-- Second set of dials for Add to Batch -->
-  <div id="secondDialContainer" class="dial-container" style="display:none; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 20px;">
-    <h3>Current Contents in Tank</h3>
+<div id="secondDialContainer" style="display:none; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 20px;">
+  <h3 style="margin-left: 10px;">Current Contents in Tank</h3>
+  <div class="dial-container">
     <div class="dial"><label>Vol.</label><div class="scroll-list" id="currentVolumeList"></div></div>
     <div class="dial"><label>SH %</label><div class="scroll-list" id="currentShList"></div></div>
     <div class="dial"><label>Surfactant</label><div class="scroll-list" id="currentSurfactantList"></div></div>
     <div class="dial"><label>Scent</label><div class="scroll-list" id="currentScentList"></div></div>
-    <button onclick="combineBatches()" class="action-btn">🔄 Calculate Additions</button>
-    <div id="additionOutput" class="result-table"></div>
   </div>
+  <button onclick="combineBatches()" class="action-btn">🔄 Calculate Additions</button>
+  <div id="additionOutput" class="result-table"></div>
+</div>
+
 
   <script src="header.js"></script>
   <script>
