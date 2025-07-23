@@ -37,9 +37,13 @@
     <label for="batchDropdown">Select a batch:</label>
     <select id="batchDropdown" style="width:100%; margin-bottom:1rem;"></select>
 
-    <label>Extra Volume (L):</label>
-    <input type="number" id="extraVolume" placeholder="e.g. 20" style="width:100%; margin-bottom:1rem;" />
-
+      <div class="dial-container">
+    <div class="dial"><label>Vol.</label><div class="scroll-list" id="volumeList"></div></div>
+    <div class="dial"><label>SH %</label><div class="scroll-list" id="shList"></div></div>
+    <div class="dial"><label>Surfactant</label><div class="scroll-list" id="surfactantList"></div></div>
+    <div class="dial"><label>Scent</label><div class="scroll-list" id="scentList"></div></div>
+  </div>
+    
     <button onclick="addToExistingBatch()">✅ Add Volume</button>
     <button onclick="closeAddToBatch()" style="float:right;">❌ Cancel</button>
   </div>
