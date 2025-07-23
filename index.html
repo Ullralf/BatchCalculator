@@ -27,7 +27,7 @@
       <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
       <div>$0.00</div><div>Scent</div><div>0.00L</div>
     </div>
-    <button id="saveLogBtn" onclick="saveLog()" class="action-btn">💾 Save Mix to Log</button>
+    <button id="saveLogBtn" onclick="saveLog()" class="action-btn">📂 Save Mix to Log</button>
     <button id="addToBatchBtn" onclick="toggleAddDials()" class="action-btn">➕ Add to Existing Batch</button>
   </div>
 
@@ -66,7 +66,7 @@
 
       if ([vol1, sh1, surf1, scent1, vol2, sh2, surf2, scent2].includes(null)) return;
 
-      const { stockSH } = loadSettings();
+      const { stockSH, shCostPerL = 0.5, surfCostPerL = 1.0, scentCostPerL = 2.0 } = loadSettings();
 
       const totalVol = vol1 + vol2;
 
@@ -74,16 +74,22 @@
       const surfTarget = (surf1 * vol1 + surf2 * vol2) / totalVol;
       const scentTarget = (scent1 * vol1 + scent2 * vol2) / totalVol;
 
-      const requiredSH = ((shTarget / stockSH) * totalVol).toFixed(2);
-      const requiredSurf = (surfTarget * totalVol).toFixed(2);
-      const requiredScent = (scentTarget * totalVol).toFixed(2);
-      const water = (totalVol - requiredSH - requiredSurf - requiredScent).toFixed(2);
+      const requiredSH = (shTarget / stockSH) * totalVol;
+      const requiredSurf = surfTarget * totalVol;
+      const requiredScent = scentTarget * totalVol;
+      const water = totalVol - requiredSH - requiredSurf - requiredScent;
+
+      const costSH = requiredSH * shCostPerL;
+      const costSurf = requiredSurf * surfCostPerL;
+      const costScent = requiredScent * scentCostPerL;
+      const totalCost = costSH + costSurf + costScent;
 
       document.getElementById("additionOutput").innerHTML = `
-        <div>Combined Mix Targets</div><div>Water</div><div>${water}L</div>
-        <div></div><div>SH</div><div>${requiredSH}L</div>
-        <div></div><div>Surfactant</div><div>${requiredSurf}L</div>
-        <div></div><div>Scent</div><div>${requiredScent}L</div>
+        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
+        <div>$${totalCost.toFixed(2)}</div><div>SH</div><div>${requiredSH.toFixed(2)}L</div>
+        <div>$${costSH.toFixed(2)}</div><div>Surfactant</div><div>${requiredSurf.toFixed(2)}L</div>
+        <div>$${costSurf.toFixed(2)}</div><div>Scent</div><div>${requiredScent.toFixed(2)}L</div>
+        <div>$${costScent.toFixed(2)}</div><div></div><div></div>
       `;
     }
 
@@ -118,7 +124,7 @@
 
     function loadSettings() {
       return {
-        stockSH: 12.5, // SH stock concentration
+        stockSH: 12.5,
         shCostPerL: 0.5,
         surfCostPerL: 1.0,
         scentCostPerL: 2.0
