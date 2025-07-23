@@ -28,44 +28,61 @@
       <div>$0.00</div><div>Scent</div><div>0.00L</div>
     </div>
     <button id="saveLogBtn" onclick="saveLog()" class="action-btn">💾 Save Mix to Log</button>
-    <button id="addToBatchBtn" onclick="showAddToBatch()" class="action-btn">➕ Add to Existing Batch</button>
+    <button id="addToBatchBtn" onclick="toggleAddDials()" class="action-btn">➕ Add to Existing Batch</button>
   </div>
 
-  <!-- Add-to-Batch Modal -->
-  <div id="addBatchModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; background:#fff; padding:1rem; border-radius:12px; box-shadow:0 0 10px #000; z-index:1000;">
-    <h3>Add to Existing Batch</h3>
-    <label for="batchDropdown">Select a batch:</label>
-    <select id="batchDropdown" style="width:100%; margin-bottom:1rem;"></select>
-
-    <label>Extra Volume (L):</label>
-    <input type="number" id="extraVolume" placeholder="e.g. 20" style="width:100%; margin-bottom:1rem;" />
-
-    <button onclick="addToExistingBatch()">✅ Add Volume</button>
-    <button onclick="closeAddToBatch()" style="float:right;">❌ Cancel</button>
+  <!-- Second set of dials for Add to Batch -->
+  <div id="secondDialContainer" class="dial-container" style="display:none; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 20px;">
+    <h3>Current Contents in Tank</h3>
+    <div class="dial"><label>Vol.</label><div class="scroll-list" id="currentVolumeList"></div></div>
+    <div class="dial"><label>SH %</label><div class="scroll-list" id="currentShList"></div></div>
+    <div class="dial"><label>Surfactant</label><div class="scroll-list" id="currentSurfactantList"></div></div>
+    <div class="dial"><label>Scent</label><div class="scroll-list" id="currentScentList"></div></div>
+    <button onclick="combineBatches()" class="action-btn">🔄 Calculate Additions</button>
+    <div id="additionOutput" class="result-table"></div>
   </div>
 
   <script src="header.js"></script>
   <script>
     let isLocked = false;
-    const lockBtn = document.getElementById("lockBtn");
 
-    function toggleLock() {
-      isLocked = !isLocked;
-      lockBtn.textContent = isLocked ? "🔒" : "🔓";
-      alert(isLocked ? "Dial is now locked." : "Dial is now unlocked.");
+    function toggleAddDials() {
+      const container = document.getElementById("secondDialContainer");
+      container.style.display = container.style.display === "none" ? "block" : "none";
     }
 
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
+    function combineBatches() {
+      const vol1 = getCenterValue(volumeList);
+      const sh1 = getCenterValue(shList);
+      const surf1 = getCenterValue(surfactantList);
+      const scent1 = getCenterValue(scentList);
 
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+      const vol2 = getCenterValue(currentVolumeList);
+      const sh2 = getCenterValue(currentShList);
+      const surf2 = getCenterValue(currentSurfactantList);
+      const scent2 = getCenterValue(currentScentList);
 
-    function formatRatio(value) {
-      const ratio = Math.round(1 / value);
-      return `1:${ratio}`;
+      if ([vol1, sh1, surf1, scent1, vol2, sh2, surf2, scent2].includes(null)) return;
+
+      const { stockSH } = loadSettings();
+
+      const totalVol = vol1 + vol2;
+
+      const shTarget = (sh1 * vol1 + sh2 * vol2) / totalVol;
+      const surfTarget = (surf1 * vol1 + surf2 * vol2) / totalVol;
+      const scentTarget = (scent1 * vol1 + scent2 * vol2) / totalVol;
+
+      const requiredSH = ((shTarget / stockSH) * totalVol).toFixed(2);
+      const requiredSurf = (surfTarget * totalVol).toFixed(2);
+      const requiredScent = (scentTarget * totalVol).toFixed(2);
+      const water = (totalVol - requiredSH - requiredSurf - requiredScent).toFixed(2);
+
+      document.getElementById("additionOutput").innerHTML = `
+        <div>Combined Mix Targets</div><div>Water</div><div>${water}L</div>
+        <div></div><div>SH</div><div>${requiredSH}L</div>
+        <div></div><div>Surfactant</div><div>${requiredSurf}L</div>
+        <div></div><div>Scent</div><div>${requiredScent}L</div>
+      `;
     }
 
     function createOptionList(container, options, unit, isRatio = false) {
@@ -86,7 +103,7 @@
         const item = document.createElement("div");
         item.className = "scroll-item";
         item.dataset.value = val;
-        item.textContent = isRatio ? formatRatio(val) : val + (unit || "");
+        item.textContent = isRatio ? `1:${Math.round(1 / val)}` : val + (unit || "");
         container.appendChild(item);
       });
 
@@ -95,6 +112,19 @@
       hyphenEnd.textContent = "-";
       container.appendChild(hyphenEnd);
     }
+
+    const volumeList = document.getElementById("volumeList");
+    const shList = document.getElementById("shList");
+    const surfactantList = document.getElementById("surfactantList");
+    const scentList = document.getElementById("scentList");
+
+    const currentVolumeList = document.getElementById("currentVolumeList");
+    const currentShList = document.getElementById("currentShList");
+    const currentSurfactantList = document.getElementById("currentSurfactantList");
+    const currentScentList = document.getElementById("currentScentList");
+
+    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
+    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
 
     function getCenterValue(container) {
       const containerRect = container.getBoundingClientRect();
@@ -121,129 +151,9 @@
       return null;
     }
 
-    function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem("batchSettings")) || {};
-      return {
-        stockSH: parseFloat(settings.shStrength) || 12.5,
-        shCostPerL: settings.shCost && settings.shSize ? settings.shCost / settings.shSize : 1.5,
-        surfCostPerL: settings.surfCost && settings.surfSize ? settings.surfCost / settings.surfSize : 6.0,
-        scentCostPerL: settings.scentCost && settings.scentSize ? settings.scentCost / settings.scentSize : 8.0
-      };
-    }
+    const allScrollLists = [volumeList, shList, surfactantList, scentList, currentVolumeList, currentShList, currentSurfactantList, currentScentList];
 
-    function calculate() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surfactant = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surfactant, scent].includes(null)) return;
-
-      const { stockSH, shCostPerL, surfCostPerL, scentCostPerL } = loadSettings();
-      const shVol = (sh / stockSH) * volume;
-      const surfVol = surfactant * volume;
-      const scentVol = scent * volume;
-      const water = volume - shVol - surfVol - scentVol;
-
-      const shCost = shVol * shCostPerL;
-      const surfCost = surfVol * surfCostPerL;
-      const scentCost = scentVol * scentCostPerL;
-
-      document.getElementById("resultsTable").innerHTML = `
-        <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
-        <div>$${shCost.toFixed(2)}</div><div>SH</div><div>${shVol.toFixed(2)}L</div>
-        <div>$${surfCost.toFixed(2)}</div><div>Surfactant</div><div>${surfVol.toFixed(2)}L</div>
-        <div>$${scentCost.toFixed(2)}</div><div>Scent</div><div>${scentVol.toFixed(2)}L</div>
-      `;
-    }
-
-    async function saveLog() {
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surf = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surf, scent].includes(null)) return;
-
-      const timestamp = new Date().toLocaleString();
-      const client = prompt("Client name?") || "";
-      const address = prompt("Job address?") || "";
-      const notes = prompt("Notes?") || "";
-
-      let gps = "";
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            gps = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-            finalizeLog(gps);
-          },
-          () => finalizeLog("Unavailable")
-        );
-      } else {
-        finalizeLog("Not supported");
-      }
-
-      function finalizeLog(gpsCoords) {
-        const newEntry = { timestamp, client, address, notes, gps: gpsCoords, sh, surf, scent };
-        const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-        logs.push(newEntry);
-        localStorage.setItem("mixLogs", JSON.stringify(logs));
-        alert("Mix saved to log!");
-        window.location.href = "cost-log.html";
-      }
-    }
-
-    function showAddToBatch() {
-      const dropdown = document.getElementById("batchDropdown");
-      dropdown.innerHTML = "";
-      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-
-      logs.forEach((log, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = `${log.timestamp} - ${log.client || "No client"}`;
-        dropdown.appendChild(option);
-      });
-
-      document.getElementById("addBatchModal").style.display = "block";
-    }
-
-    function closeAddToBatch() {
-      document.getElementById("addBatchModal").style.display = "none";
-    }
-
-    function addToExistingBatch() {
-      const index = document.getElementById("batchDropdown").value;
-      const extraVolume = parseFloat(document.getElementById("extraVolume").value);
-      if (!index || isNaN(extraVolume) || extraVolume <= 0) {
-        alert("Please select a batch and enter a valid volume.");
-        return;
-      }
-
-      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-      const log = logs[index];
-
-      const volume = getCenterValue(volumeList);
-      const sh = getCenterValue(shList);
-      const surf = getCenterValue(surfactantList);
-      const scent = getCenterValue(scentList);
-      if ([volume, sh, surf, scent].includes(null)) return;
-
-      const { stockSH } = loadSettings();
-      const addedSH = (sh / stockSH) * extraVolume;
-      const addedSurfactant = surf * extraVolume;
-      const addedScent = scent * extraVolume;
-
-      log.sh += addedSH;
-      log.surf += addedSurfactant;
-      log.scent += addedScent;
-      log.notes = (log.notes || "") + `\n➕ Added ${extraVolume}L (${addedSH.toFixed(2)}L SH, ${addedSurfactant.toFixed(2)}L Surfactant, ${addedScent.toFixed(2)}L Scent)`;
-
-      logs[index] = log;
-      localStorage.setItem("mixLogs", JSON.stringify(logs));
-      alert("Existing batch updated!");
-      closeAddToBatch();
-    }
-
-    [volumeList, shList, surfactantList, scentList].forEach(container => {
+    allScrollLists.forEach(container => {
       let timeout;
       container.addEventListener("scroll", () => {
         if (isLocked) {
@@ -257,10 +167,18 @@
       });
     });
 
-    createOptionList(volumeList, [...Array(41)].map((_, i) => (i + 1) * 5), "L");
-    createOptionList(shList, [...Array(26)].map((_, i) => (i * 0.5).toFixed(1)), "%");
+    const volOptions = [...Array(41)].map((_, i) => (i + 1) * 5);
+    const shOptions = [...Array(26)].map((_, i) => (i * 0.5).toFixed(1));
+
+    createOptionList(volumeList, volOptions, "L");
+    createOptionList(shList, shOptions, "%");
     createOptionList(surfactantList, surfOptions, "", true);
     createOptionList(scentList, scentOptions, "", true);
+
+    createOptionList(currentVolumeList, volOptions, "L");
+    createOptionList(currentShList, shOptions, "%");
+    createOptionList(currentSurfactantList, surfOptions, "", true);
+    createOptionList(currentScentList, scentOptions, "", true);
   </script>
 </body>
 </html>
