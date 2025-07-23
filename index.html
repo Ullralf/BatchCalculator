@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BatchCalculator</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#2c3e50" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <script defer src="header.js"></script>
 </head>
 <body>
-  <!-- Include the header HTML -->
   <div id="header-container"></div>
 
+  <!-- Main Dials -->
   <div class="dial-container">
     <div class="dial"><label>Vol.</label><div class="scroll-list" id="volumeList"></div></div>
     <div class="dial"><label>SH %</label><div class="scroll-list" id="shList"></div></div>
@@ -20,165 +20,35 @@
     <div class="dial"><label>Scent</label><div class="scroll-list" id="scentList"></div></div>
   </div>
 
-  <div class="result" id="output">
-    <div class="result-table" id="resultsTable">
-      <div>Cost</div><div>Water</div><div>0.00L</div>
-      <div>$0.00</div><div>SH</div><div>0.00L</div>
-      <div>$0.00</div><div>Surfactant</div><div>0.00L</div>
-      <div>$0.00</div><div>Scent</div><div>0.00L</div>
+  <!-- Results -->
+  <div class="result-table" id="resultTable"></div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button onclick="calculateMix()" class="action-btn">🧪 Calculate Mix</button>
+    <button onclick="saveMix()" class="action-btn">💾 Save Mix to Log</button>
+    <button onclick="toggleAddToBatch()" class="action-btn">➕ Add to Existing Batch</button>
+  </div>
+
+  <!-- Add to Existing Batch Section -->
+  <div id="addToBatchSection" style="display:none; margin-top: 30px;">
+    <label for="existingBatchSelect">Select Existing Batch:</label>
+    <select id="existingBatchSelect"></select>
+
+    <div id="secondDialContainer" style="border-top: 1px solid #ccc; margin-top: 20px; padding-top: 20px;">
+      <h3 style="margin-left: 10px;">Current Contents in Tank</h3>
+      <div class="dial-container">
+        <div class="dial"><label>Vol.</label><div class="scroll-list" id="currentVolumeList"></div></div>
+        <div class="dial"><label>SH %</label><div class="scroll-list" id="currentShList"></div></div>
+        <div class="dial"><label>Surfactant</label><div class="scroll-list" id="currentSurfactantList"></div></div>
+        <div class="dial"><label>Scent</label><div class="scroll-list" id="currentScentList"></div></div>
+      </div>
+
+      <button onclick="combineBatches()" class="action-btn">🔄 Calculate Additions</button>
+      <div id="additionOutput" class="result-table"></div>
     </div>
-    <button id="saveLogBtn" onclick="saveLog()" class="action-btn">💾 Save Mix to Log</button>
-    <button id="addToBatchBtn" onclick="toggleAddDials()" class="action-btn">➕ Add to Existing Batch</button>
   </div>
 
-  <!-- Second set of dials for Add to Batch -->
-  <div id="secondDialContainer" class="dial-container" style="display:none; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 20px;">
-    <h3>Current Contents in Tank</h3>
-    <div class="dial"><label>Vol.</label><div class="scroll-list" id="currentVolumeList"></div></div>
-    <div class="dial"><label>SH %</label><div class="scroll-list" id="currentShList"></div></div>
-    <div class="dial"><label>Surfactant</label><div class="scroll-list" id="currentSurfactantList"></div></div>
-    <div class="dial"><label>Scent</label><div class="scroll-list" id="currentScentList"></div></div>
-    <button onclick="combineBatches()" class="action-btn">🔄 Calculate Additions</button>
-    <div id="additionOutput" class="result-table"></div>
-  </div>
-
-  <script src="header.js"></script>
-  <script>
-    let isLocked = false;
-
-    function toggleAddDials() {
-      const container = document.getElementById("secondDialContainer");
-      container.style.display = container.style.display === "none" ? "block" : "none";
-    }
-
-    function combineBatches() {
-      const vol1 = getCenterValue(volumeList);
-      const sh1 = getCenterValue(shList);
-      const surf1 = getCenterValue(surfactantList);
-      const scent1 = getCenterValue(scentList);
-
-      const vol2 = getCenterValue(currentVolumeList);
-      const sh2 = getCenterValue(currentShList);
-      const surf2 = getCenterValue(currentSurfactantList);
-      const scent2 = getCenterValue(currentScentList);
-
-      if ([vol1, sh1, surf1, scent1, vol2, sh2, surf2, scent2].includes(null)) return;
-
-      const { stockSH } = loadSettings();
-
-      const totalVol = vol1 + vol2;
-
-      const shTarget = (sh1 * vol1 + sh2 * vol2) / totalVol;
-      const surfTarget = (surf1 * vol1 + surf2 * vol2) / totalVol;
-      const scentTarget = (scent1 * vol1 + scent2 * vol2) / totalVol;
-
-      const requiredSH = ((shTarget / stockSH) * totalVol).toFixed(2);
-      const requiredSurf = (surfTarget * totalVol).toFixed(2);
-      const requiredScent = (scentTarget * totalVol).toFixed(2);
-      const water = (totalVol - requiredSH - requiredSurf - requiredScent).toFixed(2);
-
-      document.getElementById("additionOutput").innerHTML = `
-        <div>Combined Mix Targets</div><div>Water</div><div>${water}L</div>
-        <div></div><div>SH</div><div>${requiredSH}L</div>
-        <div></div><div>Surfactant</div><div>${requiredSurf}L</div>
-        <div></div><div>Scent</div><div>${requiredScent}L</div>
-      `;
-    }
-
-    function createOptionList(container, options, unit, isRatio = false) {
-      const hyphenStart = document.createElement("div");
-      hyphenStart.className = "scroll-item";
-      hyphenStart.textContent = "-";
-      container.appendChild(hyphenStart);
-
-      if (isRatio) {
-        const zeroItem = document.createElement("div");
-        zeroItem.className = "scroll-item";
-        zeroItem.dataset.value = 0;
-        zeroItem.textContent = "0";
-        container.appendChild(zeroItem);
-      }
-
-      options.forEach((val) => {
-        const item = document.createElement("div");
-        item.className = "scroll-item";
-        item.dataset.value = val;
-        item.textContent = isRatio ? `1:${Math.round(1 / val)}` : val + (unit || "");
-        container.appendChild(item);
-      });
-
-      const hyphenEnd = document.createElement("div");
-      hyphenEnd.className = "scroll-item";
-      hyphenEnd.textContent = "-";
-      container.appendChild(hyphenEnd);
-    }
-
-    const volumeList = document.getElementById("volumeList");
-    const shList = document.getElementById("shList");
-    const surfactantList = document.getElementById("surfactantList");
-    const scentList = document.getElementById("scentList");
-
-    const currentVolumeList = document.getElementById("currentVolumeList");
-    const currentShList = document.getElementById("currentShList");
-    const currentSurfactantList = document.getElementById("currentSurfactantList");
-    const currentScentList = document.getElementById("currentScentList");
-
-    const surfOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-    const scentOptions = [0.001, 0.002, 0.01, 0.0133, 0.0167, 0.02, 0.025, 0.0333];
-
-    function getCenterValue(container) {
-      const containerRect = container.getBoundingClientRect();
-      const centerY = containerRect.top + container.clientHeight / 2;
-      const items = container.querySelectorAll(".scroll-item");
-      let closest = null;
-      let minDist = Infinity;
-
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const dist = Math.abs(centerY - itemCenter);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = item;
-        }
-        item.classList.remove("selected");
-      });
-
-      if (closest) {
-        closest.classList.add("selected");
-        return parseFloat(closest.dataset.value);
-      }
-      return null;
-    }
-
-    const allScrollLists = [volumeList, shList, surfactantList, scentList, currentVolumeList, currentShList, currentSurfactantList, currentScentList];
-
-    allScrollLists.forEach(container => {
-      let timeout;
-      container.addEventListener("scroll", () => {
-        if (isLocked) {
-          container.scrollTop = container._lastScrollTop || 0;
-          alert("Dial is locked.");
-          return;
-        }
-        container._lastScrollTop = container.scrollTop;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => calculate(), 200);
-      });
-    });
-
-    const volOptions = [...Array(41)].map((_, i) => (i + 1) * 5);
-    const shOptions = [...Array(26)].map((_, i) => (i * 0.5).toFixed(1));
-
-    createOptionList(volumeList, volOptions, "L");
-    createOptionList(shList, shOptions, "%");
-    createOptionList(surfactantList, surfOptions, "", true);
-    createOptionList(scentList, scentOptions, "", true);
-
-    createOptionList(currentVolumeList, volOptions, "L");
-    createOptionList(currentShList, shOptions, "%");
-    createOptionList(currentSurfactantList, surfOptions, "", true);
-    createOptionList(currentScentList, scentOptions, "", true);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
