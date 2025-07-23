@@ -15,48 +15,46 @@
   <main>
     <h1>Batch Calculator</h1>
 
-    <!-- Primary Dials -->
-    <div id="primaryDials">
-      <label for="volume">Volume (L):</label>
-      <input type="number" id="volume" placeholder="Enter volume" step="0.1" />
+    <!-- Inputs -->
+    <label for="volume">Volume (L):</label>
+    <input type="number" id="volume" placeholder="Enter volume" step="0.1" />
 
-      <label for="sh">Target SH (%):</label>
-      <input type="number" id="sh" placeholder="Enter SH %" step="0.1" />
+    <label for="sh">Target SH (%):</label>
+    <input type="number" id="sh" placeholder="Enter SH %" step="0.1" />
 
-      <label for="stockSH">Stock SH (%):</label>
-      <input type="number" id="stockSH" value="12.5" step="0.1" />
+    <label for="stockSH">Stock SH (%):</label>
+    <input type="number" id="stockSH" value="12.5" step="0.1" />
 
-      <label for="surfactant">Surfactant Ratio:</label>
-      <input type="number" id="surfactant" value="0.01" step="0.001" />
+    <label for="surfactant">Surfactant Ratio:</label>
+    <input type="number" id="surfactant" value="0.01" step="0.001" />
 
-      <label for="scent">Scent Ratio:</label>
-      <input type="number" id="scent" value="0.002" step="0.001" />
+    <label for="scent">Scent Ratio:</label>
+    <input type="number" id="scent" value="0.002" step="0.001" />
 
-      <button onclick="calculate()">🧪 Calculate</button>
+    <button onclick="calculate()">🧪 Calculate</button>
 
-      <table id="resultsTable" style="margin-top: 20px; display: none;">
-        <thead>
-          <tr><th>Ingredient</th><th>Amount (L)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>SH</td><td id="shResult"></td></tr>
-          <tr><td>Surfactant</td><td id="surfResult"></td></tr>
-          <tr><td>Scent</td><td id="scentResult"></td></tr>
-          <tr><td>Water</td><td id="waterResult"></td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Results Table -->
+    <table id="resultsTable" style="margin-top: 20px; display: none;">
+      <thead>
+        <tr><th>Ingredient</th><th>Amount (L)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>SH</td><td id="shResult"></td></tr>
+        <tr><td>Surfactant</td><td id="surfResult"></td></tr>
+        <tr><td>Scent</td><td id="scentResult"></td></tr>
+        <tr><td>Water</td><td id="waterResult"></td></tr>
+      </tbody>
+    </table>
 
-    <!-- Buttons -->
+    <!-- Save / Add buttons -->
     <div style="margin-top: 20px; display: flex; gap: 1rem;">
       <button id="saveLogBtn" onclick="saveLog()" class="action-btn">💾 Save Mix to Log</button>
       <button id="addToBatchBtn" onclick="toggleAddToBatch()" class="action-btn">➕ Add to Existing Batch</button>
     </div>
 
-    <!-- Add to Existing Batch Section -->
-    <div id="addToBatchDials" style="display: none; margin-top: 40px;">
+    <!-- Add to Batch Section -->
+    <div id="addToBatchDials" style="display: none; margin-top: 20px;">
       <h3>Add to Existing Batch</h3>
-
       <label for="extraVolume">Volume (L):</label>
       <input type="number" id="extraVolume" step="0.1" />
 
@@ -74,6 +72,7 @@
 
       <button onclick="calculateAddedBatch()">🧪 Calculate</button>
 
+      <!-- Add Batch Results Table -->
       <table id="addedResultsTable" style="margin-top: 20px; display: none;">
         <thead>
           <tr><th>Ingredient</th><th>Amount (L)</th></tr>
@@ -114,13 +113,21 @@
     }
 
     function saveLog() {
+      const volume = parseFloat(document.getElementById("volume").value);
+      const sh = parseFloat(document.getElementById("shResult").textContent);
+      const surf = parseFloat(document.getElementById("surfResult").textContent);
+      const scent = parseFloat(document.getElementById("scentResult").textContent);
+      const water = parseFloat(document.getElementById("waterResult").textContent);
+      const stockSH = parseFloat(document.getElementById("stockSH").value);
+
       const log = {
-        vol: parseFloat(document.getElementById("volume").value),
-        sh: parseFloat(document.getElementById("shResult").textContent),
-        surf: parseFloat(document.getElementById("surfResult").textContent),
-        scent: parseFloat(document.getElementById("scentResult").textContent),
-        water: parseFloat(document.getElementById("waterResult").textContent),
-        stockSH: parseFloat(document.getElementById("stockSH").value),
+        vol: volume,
+        sh,
+        surf,
+        scent,
+        water,
+        stockSH,
+        remaining: volume,
         timestamp: new Date().toISOString()
       };
 
@@ -140,10 +147,7 @@
         return;
       }
 
-      const totalVol = last.vol;
-      const usedVol = last.sh + last.surf + last.scent + last.water;
-      const remainingVol = Math.max(totalVol - usedVol, 0).toFixed(2);
-
+      const remainingVol = Math.max(last.remaining || last.vol, 0).toFixed(2);
       const shPercent = ((last.sh / last.vol) * last.stockSH).toFixed(2);
       const surfRatio = (last.surf / last.vol).toFixed(3);
       const scentRatio = (last.scent / last.vol).toFixed(3);
@@ -174,8 +178,16 @@
       document.getElementById("addedSurf").textContent = surf;
       document.getElementById("addedScent").textContent = scent;
       document.getElementById("addedWater").textContent = water;
-
       document.getElementById("addedResultsTable").style.display = "table";
+
+      // Update remaining in storage
+      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
+      if (logs.length > 0) {
+        logs[logs.length - 1].remaining -= vol;
+        logs[logs.length - 1].remaining = Math.max(logs[logs.length - 1].remaining, 0);
+        localStorage.setItem("mixLogs", JSON.stringify(logs));
+        document.getElementById("remainingLitres").textContent = logs[logs.length - 1].remaining.toFixed(2);
+      }
     }
   </script>
 </body>
