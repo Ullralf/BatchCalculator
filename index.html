@@ -52,20 +52,38 @@
       <button id="addToBatchBtn" onclick="toggleAddToBatch()" class="action-btn">➕ Add to Existing Batch</button>
     </div>
 
-    <!-- Add to Batch Dials -->
+    <!-- Add to Batch Section -->
     <div id="addToBatchDials" style="display: none; margin-top: 20px;">
       <h3>Add to Existing Batch</h3>
-      <label for="extraVolume">New Volume (L):</label>
+      <label for="extraVolume">Volume (L):</label>
       <input type="number" id="extraVolume" step="0.1" />
 
       <label for="manualSH">Target SH (%):</label>
       <input type="number" id="manualSH" step="0.1" />
+
+      <label for="manualStockSH">Stock SH (%):</label>
+      <input type="number" id="manualStockSH" step="0.1" />
 
       <label for="manualSurf">Surfactant Ratio:</label>
       <input type="number" id="manualSurf" step="0.001" />
 
       <label for="manualScent">Scent Ratio:</label>
       <input type="number" id="manualScent" step="0.001" />
+
+      <button onclick="calculateAddedBatch()">🧪 Calculate</button>
+
+      <!-- Add Batch Results Table -->
+      <table id="addedResultsTable" style="margin-top: 20px; display: none;">
+        <thead>
+          <tr><th>Ingredient</th><th>Amount (L)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SH</td><td id="addedSH"></td></tr>
+          <tr><td>Surfactant</td><td id="addedSurf"></td></tr>
+          <tr><td>Scent</td><td id="addedScent"></td></tr>
+          <tr><td>Water</td><td id="addedWater"></td></tr>
+        </tbody>
+      </table>
 
       <div id="remainingInfo" style="margin-top: 10px; font-size: 0.9rem; color: gray;">
         Remaining from batch: <span id="remainingLitres">0.00</span> L
@@ -131,11 +149,32 @@
 
       document.getElementById("extraVolume").value = remainingVol;
       document.getElementById("manualSH").value = shPercent;
+      document.getElementById("manualStockSH").value = last.stockSH;
       document.getElementById("manualSurf").value = surfRatio;
       document.getElementById("manualScent").value = scentRatio;
       document.getElementById("remainingLitres").textContent = remainingVol;
 
-      dials.style.display = dials.style.display === "none" ? "block" : "none";
+      dials.style.display = "block";
+    }
+
+    function calculateAddedBatch() {
+      const vol = parseFloat(document.getElementById("extraVolume").value);
+      const targetSH = parseFloat(document.getElementById("manualSH").value);
+      const stockSH = parseFloat(document.getElementById("manualStockSH").value);
+      const surfRatio = parseFloat(document.getElementById("manualSurf").value);
+      const scentRatio = parseFloat(document.getElementById("manualScent").value);
+
+      const sh = ((targetSH / stockSH) * vol).toFixed(2);
+      const surf = (surfRatio * vol).toFixed(2);
+      const scent = (scentRatio * vol).toFixed(2);
+      const water = (vol - sh - surf - scent).toFixed(2);
+
+      document.getElementById("addedSH").textContent = sh;
+      document.getElementById("addedSurf").textContent = surf;
+      document.getElementById("addedScent").textContent = scent;
+      document.getElementById("addedWater").textContent = water;
+
+      document.getElementById("addedResultsTable").style.display = "table";
     }
   </script>
 </body>
