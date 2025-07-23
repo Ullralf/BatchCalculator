@@ -114,7 +114,7 @@ header {
   text-align: left;
 }
 
-#saveLogBtn {
+.action-btn {
   margin-top: 1em;
   background: #2c3e50;
   color: white;
