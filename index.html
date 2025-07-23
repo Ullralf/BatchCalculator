@@ -35,9 +35,7 @@
 
     <!-- Results Table -->
     <table id="resultsTable" style="margin-top: 20px; display: none;">
-      <thead>
-        <tr><th>Ingredient</th><th>Amount (L)</th></tr>
-      </thead>
+      <thead><tr><th>Ingredient</th><th>Amount (L)</th></tr></thead>
       <tbody>
         <tr><td>SH</td><td id="shResult"></td></tr>
         <tr><td>Surfactant</td><td id="surfResult"></td></tr>
@@ -46,7 +44,7 @@
       </tbody>
     </table>
 
-    <!-- Save / Add buttons -->
+    <!-- Save / Add Buttons -->
     <div style="margin-top: 20px; display: flex; gap: 1rem;">
       <button id="saveLogBtn" onclick="saveLog()" class="action-btn">💾 Save Mix to Log</button>
       <button id="addToBatchBtn" onclick="toggleAddToBatch()" class="action-btn">➕ Add to Existing Batch</button>
@@ -74,9 +72,7 @@
 
       <!-- Add Batch Results Table -->
       <table id="addedResultsTable" style="margin-top: 20px; display: none;">
-        <thead>
-          <tr><th>Ingredient</th><th>Amount (L)</th></tr>
-        </thead>
+        <thead><tr><th>Ingredient</th><th>Amount (L)</th></tr></thead>
         <tbody>
           <tr><td>SH</td><td id="addedSH"></td></tr>
           <tr><td>Surfactant</td><td id="addedSurf"></td></tr>
@@ -113,21 +109,13 @@
     }
 
     function saveLog() {
-      const volume = parseFloat(document.getElementById("volume").value);
-      const sh = parseFloat(document.getElementById("shResult").textContent);
-      const surf = parseFloat(document.getElementById("surfResult").textContent);
-      const scent = parseFloat(document.getElementById("scentResult").textContent);
-      const water = parseFloat(document.getElementById("waterResult").textContent);
-      const stockSH = parseFloat(document.getElementById("stockSH").value);
-
       const log = {
-        vol: volume,
-        sh,
-        surf,
-        scent,
-        water,
-        stockSH,
-        remaining: volume,
+        vol: parseFloat(document.getElementById("volume").value),
+        sh: parseFloat(document.getElementById("shResult").textContent),
+        surf: parseFloat(document.getElementById("surfResult").textContent),
+        scent: parseFloat(document.getElementById("scentResult").textContent),
+        water: parseFloat(document.getElementById("waterResult").textContent),
+        stockSH: parseFloat(document.getElementById("stockSH").value),
         timestamp: new Date().toISOString()
       };
 
@@ -143,11 +131,11 @@
       const last = logs[logs.length - 1];
 
       if (!last) {
-        alert("No existing batch found.");
+        alert("No existing batch found. Please save one first.");
         return;
       }
 
-      const remainingVol = Math.max(last.remaining || last.vol, 0).toFixed(2);
+      const remainingVol = last.vol.toFixed(2);
       const shPercent = ((last.sh / last.vol) * last.stockSH).toFixed(2);
       const surfRatio = (last.surf / last.vol).toFixed(3);
       const scentRatio = (last.scent / last.vol).toFixed(3);
@@ -178,16 +166,8 @@
       document.getElementById("addedSurf").textContent = surf;
       document.getElementById("addedScent").textContent = scent;
       document.getElementById("addedWater").textContent = water;
-      document.getElementById("addedResultsTable").style.display = "table";
 
-      // Update remaining in storage
-      const logs = JSON.parse(localStorage.getItem("mixLogs") || "[]");
-      if (logs.length > 0) {
-        logs[logs.length - 1].remaining -= vol;
-        logs[logs.length - 1].remaining = Math.max(logs[logs.length - 1].remaining, 0);
-        localStorage.setItem("mixLogs", JSON.stringify(logs));
-        document.getElementById("remainingLitres").textContent = logs[logs.length - 1].remaining.toFixed(2);
-      }
+      document.getElementById("addedResultsTable").style.display = "table";
     }
   </script>
 </body>
