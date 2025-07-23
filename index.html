@@ -84,14 +84,15 @@
       const costScent = requiredScent * scentCostPerL;
       const totalCost = costSH + costSurf + costScent;
 
-      document.getElementById("additionOutput").innerHTML = `
+  <div class="result" id="additionoutput">
+    <div class="result-table" id="additionoutput">
         <div>Cost</div><div>Water</div><div>${water.toFixed(2)}L</div>
         <div>$${totalCost.toFixed(2)}</div><div>SH</div><div>${requiredSH.toFixed(2)}L</div>
         <div>$${costSH.toFixed(2)}</div><div>Surfactant</div><div>${requiredSurf.toFixed(2)}L</div>
         <div>$${costSurf.toFixed(2)}</div><div>Scent</div><div>${requiredScent.toFixed(2)}L</div>
         <div>$${costScent.toFixed(2)}</div><div></div><div></div>
-      `;
-    }
+    </div>
+  </div>
 
     function calculate() {
       const vol = getCenterValue(volumeList);
