@@ -1,66 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cost Log</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#2c3e50" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    :root {
-      --primary: #1e293b;
-      --accent: #818cf8;
-      --bg-light: #0f172a;
-      --text-dark: #f1f5f9;
-      --card-bg: #1e293b;
-      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-      --radius: 1rem;
+    main {
+      padding: 1em;
+      max-width: 700px;
+      margin: auto;
     }
-
-    [data-theme="light"] {
-      --primary: #0f172a;
-      --accent: #4f46e5;
-      --bg-light: #f8fafc;
-      --text-dark: #1e293b;
-      --card-bg: #ffffff;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    th, td {
+      text-align: left;
+      padding: 0.75em;
+      border-bottom: 1px solid #ddd;
     }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
+    th {
+      background: var(--primary);
+      color: white;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #666;
       text-align: center;
-      overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
+      margin-top: 1em;
+    }
+    .clear-button {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 0.75em 1em;
+      margin-top: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      display: block;
+      margin-left: auto;
     }
   </style>
 </head>
 <body>
-  <header>
-    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
-    Cost Log Page
-  </header>
+  <div id="header-container"></div>
 
+  <main>
+    <h2>Batch Cost Log</h2>
+    <table id="costTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Batch Size</th>
+          <th>SH Used</th>
+          <th>Surfactant</th>
+          <th>Scent</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="clear-button" onclick="clearLog()">Clear Log</button>
+    <div class="note">This log shows previous mix batches and their costs. Data is stored locally.</div>
+  </main>
+
+  <script src="header.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-    });
+    fetch('header.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('header-container');
+        container.innerHTML = data;
+        if (typeof initHeader === 'function') initHeader();
+      })
+      .catch(error => console.error("Error loading header:", error));
 
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
+    function loadLog() {
+      const log = JSON.parse(localStorage.getItem("costLog") || "[]");
+      const tbody = document.querySelector("#costTable tbody");
+      tbody.innerHTML = "";
+      log.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.date}</td>
+          <td>${entry.batchSize}L</td>
+          <td>${entry.sh}L</td>
+          <td>${entry.surf}L</td>
+          <td>${entry.scent}L</td>
+          <td>$${entry.cost.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+      });
     }
+
+    function clearLog() {
+      if (confirm("Are you sure you want to clear the log?")) {
+        localStorage.removeItem("costLog");
+        loadLog();
+      }
+    }
+
+    loadLog();
   </script>
 </body>
 </html>
