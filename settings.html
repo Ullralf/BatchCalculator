@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,44 +8,119 @@
   <link rel="icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#2c3e50" />
   <style>
+    :root {
+      --primary: #1e293b;
+      --accent: #818cf8;
+      --bg-light: #0f172a;
+      --text-dark: #f1f5f9;
+      --card-bg: #1e293b;
+      --shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      --radius: 1rem;
+    }
+
+    [data-theme="light"] {
+      --primary: #0f172a;
+      --accent: #4f46e5;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: 'Arial', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
     }
+
     header {
-      background: #2c3e50;
+      background: var(--primary);
       color: white;
-      padding: 1em;
-      text-align: center;
+      padding: 1rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--shadow);
     }
+
+    .header-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.85;
+    }
+
+    .header-icon:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Positioning for the lock and dark mode buttons */
+    .lock-btn {
+      left: 1rem;
+      background: transparent;
+      border: none;
+      color: white;
+    }
+
+    .dark-toggle {
+      left: 3.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Icon buttons for recipes, log, settings (on the right) */
+    .settings-icon { right: 1rem; }
+    .log-icon { right: 3.5rem; }
+    .recipes-icon { right: 6rem; }
+
     main {
       padding: 1em;
       max-width: 500px;
       margin: auto;
     }
+
     label {
       display: block;
       margin-top: 1em;
     }
+
     input {
       width: 100%;
       padding: 0.5em;
       margin-top: 0.5em;
+      background: var(--card-bg);
+      color: var(--text-dark);
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
     }
+
     button {
       display: block;
       width: 100%;
       padding: 1em;
       margin-top: 2em;
-      background: #2c3e50;
+      background: var(--primary);
       color: white;
       border: none;
       font-size: 1em;
       cursor: pointer;
       border-radius: 5px;
     }
+
     .note {
       font-size: 0.9em;
       color: #666;
@@ -56,8 +131,14 @@
 </head>
 <body>
   <header>
+    <button class="lock-btn header-icon" id="lockBtn" onclick="toggleLock()">🔓</button>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌓</button>
     Settings
+    <span class="recipes-icon header-icon" title="Recipes" onclick="window.location.href='recipes.html'">🍳</span>
+    <span class="log-icon header-icon" title="Cost Log" onclick="window.location.href='cost-log.html'">📜</span>
+    <span class="settings-icon header-icon" title="Settings" onclick="window.location.href='settings.html'">⚙️</span>
   </header>
+
   <main>
     <label>SH Strength (%):
       <input type="number" step="0.1" id="shStrength">
@@ -121,7 +202,22 @@
       document.getElementById("scentSize").value = saved.scentSize || "";
     }
 
-    loadSettings();
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);  // Save the theme to localStorage
+    }
+
+    // On page load, check for the theme preference in localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+      loadSettings();
+    });
   </script>
 </body>
 </html>
